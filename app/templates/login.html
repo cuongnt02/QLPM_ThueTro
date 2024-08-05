@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "material_wtf.html" as wtf %}
 
 {% block title %}
     {{ super() }}
@@ -15,6 +16,9 @@
 {% endblock %}
 
 {% block content %}
-<h1>HOME CONTENT</h1>
+    <div class="container center">
+        <h1>Đăng nhập</h1>
+        {{wtf.generate_form(form)}}
+    </div>
 {% endblock %}
 
