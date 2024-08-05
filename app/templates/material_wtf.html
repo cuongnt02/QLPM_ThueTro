@@ -1,0 +1,46 @@
+{% macro form_field(field, autofocus) %}
+    {%- if (field.type == 'SubmitField') %}
+    {{ field(class="btn waves-effect waves-light row blue lighten-1")}}
+    {%- else %}
+    <div class="row">
+        <div class="input-field col s8 offset-s2">
+            {{ field.label() }}
+            {% if autofocus %}
+                {{field(class='' + (' invalid' if field.errors else ''), autofocus=True)}}
+            {% else %}
+                {{field(class='' + (' invalid' if field.errors else ''))}}
+            {% endif %}
+            {%- for error in field.errors %}
+                <div class="helper-text red-text col s8 offset-s2 left-align">{{ error }}</div>
+            {%- endfor %}
+        </div>
+    </div>
+    {%- endif %}
+{% endmacro %}
+
+{% macro generate_form(form , action="", method="post", id="", novalidate=True) %}
+<div class="row">
+    <form 
+        {%- if action !="None" %} action="{{ action }}"{% endif -%}
+        {%- if method %} method="{{ method }}"{% endif -%}
+        {%- if id %}id="{{ id }}"{% endif -%}
+        {%- if novalidate %}novalidate{% endif -%}
+        >
+        {{ form.hidden_tag() }}
+        {%- for field, errors in form.errors.items() %}
+            {%- if form[field].widget.input_type == 'hidden' %}
+                {%- for error in errors %}
+                    <div class="red-text row">{{ error }}</div>
+                {%- endfor -%}
+            {%- endif %}
+        {%- endfor %}
+        {% set ns = namespace(first_field=true) %}
+        {%- for field in form %}
+            {% if field.widget.input_type != 'hidden' -%}
+                {{ form_field(field, ns.first_field) }}
+                {% set ns.first_field = false %}
+            {%- endif %}
+        {%- endfor %}
+    </form>
+</div>
+{% endmacro %}

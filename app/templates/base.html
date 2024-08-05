@@ -19,7 +19,7 @@
     {% block header %}
         {% block nav %}
         <nav>
-            <div class="nav-wrapper row">
+            <div class="nav-wrapper row indigo accent-2">
                 <div class="col s2">
                     <a href="/" class="brand-logo">ThueTro</a>
                 </div>
@@ -34,7 +34,7 @@
                     <i class="material-icons">close</i>
                 </div>
                 <ul id="nav-mobile" class="hide-on-med-and-down col s3">
-                  <li><a href="/">Đăng nhập</a></li>
+                  <li><a href="/login">Đăng nhập</a></li>
                   <li><a href="/">Đăng kí</a></li>
                 </ul>
             </div>
@@ -43,6 +43,13 @@
     {% endblock %}
     </header>
     <section class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="red-text">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
         {% block content %}
         {% endblock %}
     </section>
