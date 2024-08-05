@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/materialize.min.css')}}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    {% if title %}
+    <title>{{title}} - TroThue</title>
+    {% else %}
+    <title>Untitled - TroThue</title>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/materialize.min.js') }}" defer></script>
+    {% endblock %}
+</head>
+<body>
+    <header>
+    {% block header %}
+        {% block nav %}
+        <nav>
+            <div class="nav-wrapper row">
+                <div class="col s2">
+                    <a href="/" class="brand-logo">ThueTro</a>
+                </div>
+                <ul id="nav-mobile" class="hide-on-med-and-down col s3">
+                  <li><a href="/home">Trang chủ</a></li>
+                  <li><a href="/">Thuê trọ</a></li>
+                  <li><a href="/">Hợp đồng</a></li>
+                </ul>
+                <div class="input-field col s4 hide-on-med-and-down">
+                    <input id="search" type="search" required />
+                    <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                    <i class="material-icons">close</i>
+                </div>
+                <ul id="nav-mobile" class="hide-on-med-and-down col s3">
+                  <li><a href="/">Đăng nhập</a></li>
+                  <li><a href="/">Đăng kí</a></li>
+                </ul>
+            </div>
+        </nav>
+        {% endblock %}
+    {% endblock %}
+    </header>
+    <section class="container">
+        {% block content %}
+        {% endblock %}
+    </section>
+
+</body>
+
+</html>
+
+
+
