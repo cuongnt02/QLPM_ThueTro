@@ -1,5 +1,12 @@
 {% macro form_field(field, autofocus) %}
-    {%- if (field.type == 'SubmitField') %}
+    {%- if field.type == 'BooleanField' %}
+    <div class="row">
+        <label>
+            {{ field() }} 
+            <span>{{ field.label.text }}</span>
+        </label>
+    </div>
+    {%- elif (field.type == 'SubmitField') %}
     {{ field(class="btn waves-effect waves-light row blue lighten-1")}}
     {%- else %}
     <div class="row">
@@ -18,7 +25,7 @@
     {%- endif %}
 {% endmacro %}
 
-{% macro generate_form(form , action="", method="post", id="", novalidate=True) %}
+{% macro generate_form(form, action="", method="post", id="", novalidate=True) %}
 <div class="row">
     <form 
         {%- if action !="None" %} action="{{ action }}"{% endif -%}

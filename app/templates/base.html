@@ -24,9 +24,11 @@
                     <a href="/" class="brand-logo">ThueTro</a>
                 </div>
                 <ul id="nav-mobile" class="hide-on-med-and-down col s3">
-                  <li><a href="/home">Trang chủ</a></li>
-                  <li><a href="/">Thuê trọ</a></li>
-                  <li><a href="/">Hợp đồng</a></li>
+                    <li><a href="{{ url_for('home') }}">Trang chủ</a></li>
+                    {% if not current_user.is_anonymous %}     
+                    <li><a href="/">Thuê trọ</a></li>
+                    <li><a href="/">Hợp đồng</a></li>
+                    {% endif %}
                 </ul>
                 <div class="input-field col s4 hide-on-med-and-down">
                     <input id="search" type="search" required />
@@ -34,8 +36,23 @@
                     <i class="material-icons">close</i>
                 </div>
                 <ul id="nav-mobile" class="hide-on-med-and-down col s3">
-                  <li><a href="/login">Đăng nhập</a></li>
-                  <li><a href="/">Đăng kí</a></li>
+                    <div class="row valign-wrapper">
+                        {% if current_user.is_anonymous %}
+                        <li class="col s6"><a href="{{ url_for('login') }}">Đăng nhập</a></li>
+                        <li class="col s6"><a href="{{ url_for('register') }}">Đăng kí</a></li>
+                        {% else %}
+                        <li class="col s4 offset-s4">
+                            <a href="#" class="valign-wrapper">
+                                {% if current_user.avatar != None %}
+                                <img src="{{ current_user.avatar }}" alt="user avatar" class="responsive-img circle"/>
+                                {% else %}
+                                <img src="https://res.cloudinary.com/dag3mcswq/image/upload/v1723043406/white_color_tabpmw.jpg" alt="default user avatar" class="responsive-img circle"/>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="col s5"><a href="{{ url_for('logout') }}">Đăng xuất</a></li>
+                        {% endif %}
+                    </div>
                 </ul>
             </div>
         </nav>
