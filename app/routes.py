@@ -19,3 +19,9 @@ def login():
         flash("Login Requested for user {}".format(form.username.data))
         return redirect('/home')
     return render_template('login.html', title=title, form=form)
+
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    title = "Đăng kí"
+    return render_template('register.html', title=title)
