@@ -10,6 +10,19 @@ python -m virtualenv venv
 pip install -r requirements.txt
 ```
 
+### Tích hợp database
+1. Tạo một database trong mysql (tên mặc định là thuetro)
+2. Thay đổi giá trị mật khẩu mysql khớp với tài khoản trên máy tính
+3. chạy các lệnh
+``` bash
+flask db upgrade
+```
+4. Mỗi khi pull về chạy lệnh
+``` bash
+flask db downgrade base
+flask db upgrade
+```
+5. Lưu ý: database chưa tạo sẵn các record
 ### Chạy app
 ``` bash
 flask run
