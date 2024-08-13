@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy import String, Text, ForeignKey, Enum, Integer, Float
 from sqlalchemy.orm import Mapped, WriteOnlyMapped
 from sqlalchemy.orm import mapped_column, relationship
@@ -48,6 +48,38 @@ class User(UserMixin, db.Model):
         return '<User {}>'.format(self.username)
 
 
+class Motel(db.Model):
+    __tablename__ = "motels"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    address: Mapped[str] = mapped_column(String(200))
+    max_room: Mapped[int] = mapped_column(Integer)
+    rooms: Mapped[Optional[List['Room']]] = relationship(
+                                                back_populates="motel")
+
+    def __repr__(self):
+        return '<Motel> {}'.format(self.address)
+
+
+class Room(db.Model):
+    __tablename__ = "rooms"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    room_name: Mapped[str] = mapped_column(String(100))
+    base_price: Mapped[float] = mapped_column(Float)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    water_price: Mapped[float] = mapped_column(Float)
+    electric_price: Mapped[float] = mapped_column(Float)
+    picture: Mapped[Optional[str]] = mapped_column(String(256))
+
+    motel_id: Mapped[str] = mapped_column(ForeignKey(Motel.id))
+    motel: Mapped['Motel'] = relationship(back_populates="rooms")
+    posts: WriteOnlyMapped['Post'] = relationship(back_populates="room")
+
+    def __repr__(self):
+        return '<Room> {}'.format(self.room_name)
+
+
 class Post(db.Model):
     __tablename__ = "posts"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
@@ -57,28 +89,10 @@ class Post(db.Model):
         index=True,
         default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh")))
     user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+    room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
 
     author: Mapped[User] = relationship(back_populates='posts')
+    room: Mapped[Room] = relationship(back_populates='posts')
 
     def __repr__(self):
         return '<Post {}>'.format(self.title)
-
-
-class Motel(db.Model):
-    __tablename__ = "motels"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    address: Mapped[str] = mapped_column(String(200))
-    max_room: Mapped[int] = mapped_column(Integer)
-
-
-class Room(db.Model):
-    __tablename__ = "rooms"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    room_name: Mapped[str] = mapped_column(String(100))
-    base_price: Mapped[float] = mapped_column(Float)
-    description: Mapped[str] = mapped_column(Text)
-    water_price: Mapped[float] = mapped_column(Float)
-    electric_price: Mapped[float] = mapped_column(Float)
-    picture: Mapped[str] = mapped_column(String(256))
