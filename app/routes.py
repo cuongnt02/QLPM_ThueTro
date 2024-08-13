@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 
 from app import app, db
-from app.models import User
+from app.models import User, Post
 from app.forms import LoginForm, RegisterForm
 
 
@@ -15,8 +15,12 @@ from app.forms import LoginForm, RegisterForm
 @app.route('/index')
 @login_required
 def home():
-    title = "Trang chủ"
-    return render_template('home.html', title=title)
+    posts = db.session.scalars(select(Post)).all()
+    keyword = request.args.get('title')
+    if keyword is not None and keyword != '':
+        posts = db.session.scalars(select(Post).where(
+                Post.title.like('%{}%'.format(keyword)))).all()
+    return render_template('home.html', title="Trang chủ", posts=posts)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -61,3 +65,10 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+@app.route("/post/<post_id>", methods=['GET'])
+def post(post_id):
+    post = db.session.scalar(select(Post).where(Post.id == post_id))
+    return render_template("post_info.html",
+                           title="Bài viết", post=post)

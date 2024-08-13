@@ -21,15 +21,39 @@
 {% block content %}
 <h1 class="center">Hệ thống thuê nhà trọ uy tín</h1>
 <div class="row">
-    <form class="col s6 offset-s3">
+    <form class="col s6 offset-s3" action="{{ url_for('home') }}" method="GET">
         <div class="row">
             <div class="input-field">
                 <i class="material-icons prefix">search</i>
-                <input id="search" type="search" required/>
+                <input id="search" type="search" name="title" required/>
                 <label for="search">Tìm kiếm nhà trọ</label>
             </div>
         </div>
     </form>
+</div>
+<div class="row">
+{% for post in posts %}
+ <div class="col s8 offset-s2">
+    <div class="card horizontal">
+      <div class="card-image">
+        {% if post.room.picture != '' %}
+        <img src="{{post.room.picture}}">
+        {% else %}
+        <img src="https://res.cloudinary.com/dag3mcswq/image/upload/v1723575885/motel_for_rent_zr9xhc.jpg">
+        {% endif %}
+      </div>
+      <div class="card-stacked">
+        <div class="card-content">
+            <h5>{{ post.title }}</h5>
+            <p>{{ post.content }}</p>
+        </div>
+        <div class="card-action">
+            <a href="{{ url_for('post', post_id=post.id)}}">Xem thông tin</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
 </div>
 {% endblock %}
 
