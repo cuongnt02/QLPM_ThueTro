@@ -4,8 +4,10 @@
     {% block head %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block css %}
     <link rel="stylesheet" href="{{url_for('static', filename='css/materialize.min.css')}}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    {% endblock %}
     {% if title %}
     <title>{{title}} - TroThue</title>
     {% else %}
@@ -18,7 +20,7 @@
     <header>
     {% block header %}
         {% block nav %}
-        <nav>
+        <nav class="row">
             <div class="nav-wrapper row indigo accent-2">
                 <div class="col s2">
                     <a href="/" class="brand-logo">ThueTro</a>
@@ -30,12 +32,7 @@
                     <li><a href="/">Hợp đồng</a></li>
                     {% endif %}
                 </ul>
-                <div class="input-field col s4 hide-on-med-and-down">
-                    <input id="search" type="search" required />
-                    <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-                    <i class="material-icons">close</i>
-                </div>
-                <ul id="nav-mobile" class="hide-on-med-and-down col s3">
+                <ul id="nav-mobile" class="hide-on-med-and-down col s3 offset-s4">
                     <div class="row valign-wrapper">
                         {% if current_user.is_anonymous %}
                         <li class="col s6"><a href="{{ url_for('login') }}">Đăng nhập</a></li>
@@ -63,7 +60,7 @@
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-                <div class="red-text">{{ message }}</div>
+                <div class="red-text center">{{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}

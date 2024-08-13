@@ -2,7 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Optional
-from sqlalchemy import String, Text, ForeignKey, Enum
+from sqlalchemy import String, Text, ForeignKey, Enum, Integer, Float
 from sqlalchemy.orm import Mapped, WriteOnlyMapped
 from sqlalchemy.orm import mapped_column, relationship
 from flask_login import UserMixin
@@ -14,6 +14,7 @@ from app import db
 class UserRole(RoleEnum):
     USER = 1
     ADMIN = 2
+    LANDLORD = 3
 
 
 @login.user_loader
@@ -61,3 +62,23 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.title)
+
+
+class Motel(db.Model):
+    __tablename__ = "motels"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    address: Mapped[str] = mapped_column(String(200))
+    max_room: Mapped[int] = mapped_column(Integer)
+
+
+class Room(db.Model):
+    __tablename__ = "rooms"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    room_name: Mapped[str] = mapped_column(String(100))
+    base_price: Mapped[float] = mapped_column(Float)
+    description: Mapped[str] = mapped_column(Text)
+    water_price: Mapped[float] = mapped_column(Float)
+    electric_price: Mapped[float] = mapped_column(Float)
+    picture: Mapped[str] = mapped_column(String(256))
