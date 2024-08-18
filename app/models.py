@@ -5,6 +5,7 @@ from typing import Optional, List
 from sqlalchemy import String, Text, ForeignKey, Enum, Integer, Float
 from sqlalchemy.orm import Mapped, WriteOnlyMapped
 from sqlalchemy.orm import mapped_column, relationship
+from uuid import uuid4
 from flask_login import UserMixin
 from app import login
 from enum import Enum as RoleEnum
@@ -25,7 +26,8 @@ def load_user(id):
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=uuid4())
     username: Mapped[str] = mapped_column(String(50), index=True, unique=True)
     email: Mapped[str] = mapped_column(String(150), index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
@@ -47,11 +49,16 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+    def __str__(self):
+        return 'User({}, {}, {})'.format(
+                self.username, self.email, self.full_name)
+
 
 class Motel(db.Model):
     __tablename__ = "motels"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=uuid4())
     address: Mapped[str] = mapped_column(String(200))
     max_room: Mapped[int] = mapped_column(Integer)
     rooms: Mapped[Optional[List['Room']]] = relationship(
@@ -60,11 +67,16 @@ class Motel(db.Model):
     def __repr__(self):
         return '<Motel> {}'.format(self.address)
 
+    def __str__(self):
+        return 'Post({}, {})'.format(
+                self.address, self.max_room)
+
 
 class Room(db.Model):
     __tablename__ = "rooms"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=uuid4())
     room_name: Mapped[str] = mapped_column(String(100))
     base_price: Mapped[float] = mapped_column(Float)
     description: Mapped[Optional[str]] = mapped_column(Text)
@@ -79,10 +91,15 @@ class Room(db.Model):
     def __repr__(self):
         return '<Room> {}'.format(self.room_name)
 
+    def __str__(self):
+        return 'Post({}, {}, {})'.format(
+                self.room_name, self.base_price, self.motel.address)
+
 
 class Post(db.Model):
     __tablename__ = "posts"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=uuid4())
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[str] = mapped_column(Text)
     timestamp: Mapped[datetime] = mapped_column(
@@ -96,3 +113,7 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.title)
+
+    def __str__(self):
+        return 'Post({}, {}, {})'.format(
+                self.title, self.timestamp, self.author.username)
