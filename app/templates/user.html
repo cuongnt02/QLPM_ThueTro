@@ -19,9 +19,44 @@
 {% endblock %}
 
 {% block content %}
-<h1>User: {{ user.username }}</h1>
-<hr>
-<h3>Email: {{ user.email }}</h3>
-<h3>Full Name: {{ user.full_name }}</h3>
+    <div class="row">
+        <div class="row col s12">
+            <h3>Thông tin user</h3>
+            <div class="row col s12 center">
+                {% if current_user.avatar != None %}
+                <img src="{{ current_user.avatar }}" alt="user avatar" class="responsive-img circle"/>
+                {% else %}
+                <img src="https://res.cloudinary.com/dag3mcswq/image/upload/v1723043406/white_color_tabpmw.jpg" alt="default user avatar" class="responsive-img circle"/>
+                {% endif %}
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><strong>Họ tên</strong></td>
+                        <td>value 1</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email</strong></td>
+                        <td>value 2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Địa chỉ</strong></td>
+                        <td>value 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SDT</strong></td>
+                        <td>value 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Loại tài khoản</strong></td>
+                        <td>value 3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row col s12">
+            <a class="btn" href="{{ url_for('user_edit', username=current_user.username) }}">Sửa thông tin</a>
+        </div>
+    </div>
 {% endblock %}
 

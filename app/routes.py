@@ -1,12 +1,13 @@
 from urllib.parse import urlsplit
 from uuid import uuid4
+from werkzeug.datastructures import MultiDict
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 
 from app import app, db
 from app.models import User, Post, Motel
-from app.forms import LoginForm, RegisterForm
+from app.forms import LoginForm, RegisterForm, UserEditForm
 
 
 @app.route('/')
@@ -84,3 +85,18 @@ def motel(motel_id):
 def user(username):
     user = db.first_or_404(select(User).where(User.username == username))
     return render_template("user.html", user=user)
+
+
+@app.route("/user/<username>/edit")
+@login_required
+def user_edit(username):
+    user = db.first_or_404(select(User).where(User.username == username))
+    form = UserEditForm(formdata=MultiDict(
+        {
+            'username': user.username,
+            'email': user.email,
+            'full_name': user.full_name,
+            'phone_number': user.phone_number,
+            'address': user.address,
+        }))
+    return render_template("user_edit.html", user=user, form=form)

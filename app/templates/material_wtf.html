@@ -7,7 +7,19 @@
         </label>
     </div>
     {%- elif (field.type == 'SubmitField') %}
+    <div class="row col s12 center">
     {{ field(class="btn waves-effect waves-light row blue lighten-1")}}
+    </div>
+    {%- elif (field.type == 'FileField') %}
+    <div class="file-field input-field col s8 offset-s2">
+        <div class="btn">
+            <span>Upload Avatar</span>
+            {{ field() }}
+        </div>
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
+        </div>
+    </div>
     {%- else %}
     <div class="row">
         <div class="input-field col s8 offset-s2">
