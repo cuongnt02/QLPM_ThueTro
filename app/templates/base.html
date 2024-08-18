@@ -39,7 +39,7 @@
                         <li class="col s6"><a href="{{ url_for('register') }}">Đăng kí</a></li>
                         {% else %}
                         <li class="col s4 offset-s4">
-                            <a href="#" class="valign-wrapper">
+                            <a href="{{ url_for('user', username=current_user.username) }}" class="valign-wrapper">
                                 {% if current_user.avatar != None %}
                                 <img src="{{ current_user.avatar }}" alt="user avatar" class="responsive-img circle"/>
                                 {% else %}

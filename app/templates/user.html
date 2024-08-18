@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    {{ super() }}
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block header %}
+    {% block nav %}
+        {{ super() }}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+<h1>User: {{ user.username }}</h1>
+<hr>
+<h3>Email: {{ user.email }}</h3>
+<h3>Full Name: {{ user.full_name }}</h3>
+{% endblock %}
+

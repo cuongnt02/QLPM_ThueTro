@@ -19,7 +19,46 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.content }}
+    <div class="row">
+        <div class="col s12">
+            <h1>{{ post.title }}</h1>
+            <p>{{ post.content }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <h3>Hình ảnh</h2>
+            <!-- many images here -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="row col s6">
+            <h3>Thông tin phòng trọ</h3>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><strong>INFO 1</strong></td>
+                        <td>value 1</td>
+                    </tr>
+                    <tr>
+                        <td><strong>INFO 2</strong></td>
+                        <td>value 2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>INFO 3</strong></td>
+                        <td>value 3</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row col s12">
+                <a class="btn">Đặt phòng</a>
+            </div>
+        </div>
+        <div class="col s6">
+            <h3>Bình luận</h3>
+            <!-- comment section here  -->
+        </div>
+    </div>
 {% endblock %}
 
