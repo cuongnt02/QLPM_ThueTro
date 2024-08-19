@@ -10,9 +10,7 @@ from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm
 
 
-@app.route('/')
-@app.route('/home')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     posts = db.session.scalars(select(Post)).all()
     keyword = request.args.get('title')
@@ -21,6 +19,9 @@ def home():
             Post.title.like(f'%{keyword}%'))).all()
     return render_template('home.html', title="Trang chủ", posts=posts)
 
+@app.route('/about', methods=['GET', 'POST'])
+def about():
+   return "ahha"
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
