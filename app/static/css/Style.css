@@ -1,0 +1,41 @@
+/* Các kiểu tùy chỉnh cho trang web */
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    margin-bottom: 2rem;
+}
+
+footer {
+    background-color: #f8f9fa;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* Các kiểu tùy chỉnh cho trang chi tiết phòng */
+.carousel-item img {
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: .25rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1rem;
+}
+

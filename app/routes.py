@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 
 from app import app, db
-from app.models import User, Post, Motel
+from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm
 
 
@@ -16,9 +16,9 @@ from app.forms import LoginForm, RegisterForm, UserEditForm
 def home():
     posts = db.session.scalars(select(Post)).all()
     keyword = request.args.get('title')
-    if keyword is not None and keyword != '':
+    if keyword:
         posts = db.session.scalars(select(Post).where(
-                Post.title.like('%{}%'.format(keyword)))).all()
+            Post.title.like(f'%{keyword}%'))).all()
     return render_template('home.html', title="Trang chủ", posts=posts)
 
 
@@ -29,7 +29,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = db.session.scalar(
-                select(User).where(User.username == form.username.data))
+            select(User).where(User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password")
             return redirect(url_for('login'))
@@ -48,10 +48,10 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         user = User(
-                id=str(uuid4()),
-                username=form.username.data,
-                email=form.email.data,
-                full_name=form.full_name.data)
+            id=str(uuid4()),
+            username=form.username.data,
+            email=form.email.data,
+            full_name=form.full_name.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -66,37 +66,42 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route("/post/<post_id>", methods=['GET'])
-def post(post_id):
-    post = db.session.scalar(select(Post).where(Post.id == post_id))
-    return render_template("post_info.html",
-                           title="Bài viết", post=post)
+@app.route('/room/<room_id>')
+def room_detail(room_id):
+    room = Room.query.get_or_404(room_id)
+    return render_template('room_detail.html', room=room)
 
 
-@app.route("/motel/<motel_id>", methods=['GET'])
+@app.route("/motel/<motel_id>")
 def motel(motel_id):
     motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
-    return render_template("motel_info.html",
-                           title="Thông tin nhà trọ", motel=motel)
+    return render_template("motel_info.html", title="Thông tin nhà trọ", motel=motel)
 
 
 @app.route("/user/<username>")
 @login_required
 def user(username):
-    user = db.first_or_404(select(User).where(User.username == username))
+    user = db.session.scalar(select(User).where(User.username == username))
     return render_template("user.html", user=user)
 
 
-@app.route("/user/<username>/edit")
+@app.route("/user/<username>/edit", methods=['GET', 'POST'])
 @login_required
 def user_edit(username):
-    user = db.first_or_404(select(User).where(User.username == username))
-    form = UserEditForm(formdata=MultiDict(
-        {
-            'username': user.username,
-            'email': user.email,
-            'full_name': user.full_name,
-            'phone_number': user.phone_number,
-            'address': user.address,
-        }))
+    user = db.session.scalar(select(User).where(User.username == username))
+    if user != current_user and current_user.user_role != UserRole.ADMIN:
+        flash('Bạn không có quyền chỉnh sửa thông tin của người dùng khác.')
+        return redirect(url_for('user', username=username))
+
+    form = UserEditForm(obj=user)
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        user.full_name = form.full_name.data
+        user.phone_number = form.phone_number.data
+        user.address = form.address.data
+        db.session.commit()
+        flash('Thông tin của bạn đã được cập nhật.')
+        return redirect(url_for('user', username=user.username))
+
     return render_template("user_edit.html", user=user, form=form)
