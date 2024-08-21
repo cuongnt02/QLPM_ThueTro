@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {% macro form_field(field, autofocus, disabled=False) %}
     {%- if field.type == 'BooleanField' %}
     <div class="row">
@@ -8,7 +7,7 @@
         </label>
     </div>
     {%- elif (field.type == 'SubmitField') %}
-    <div class="row col s12 center">
+    <div class="row col s8 offset-s3">
     {{ field(class="btn waves-effect waves-light row blue lighten-1")}}
     </div>
     {%- elif (field.type == 'TextAreaField') %}
@@ -49,6 +48,7 @@
 {% macro generate_form(form, action="", method="post", id="", novalidate=True) %}
 <div class="row">
     <form 
+        class="col s12" 
         {%- if action !="None" %} action="{{ action }}"{% endif -%}
         {%- if method %} method="{{ method }}"{% endif -%}
         {%- if id %}id="{{ id }}"{% endif -%}
@@ -72,70 +72,3 @@
     </form>
 </div>
 {% endmacro %}
-=======
-{% macro form_field(field, autofocus) %}
-    {%- if field.type == 'BooleanField' %}
-    <div class="row">
-        <label>
-            {{ field() }} 
-            <span>{{ field.label.text }}</span>
-        </label>
-    </div>
-    {%- elif (field.type == 'SubmitField') %}
-    <div class="row col s12 center">
-    {{ field(class="btn waves-effect waves-light row blue lighten-1")}}
-    </div>
-    {%- elif (field.type == 'FileField') %}
-    <div class="file-field input-field col s8 offset-s2">
-        <div class="btn">
-            <span>Upload Avatar</span>
-            {{ field() }}
-        </div>
-        <div class="file-path-wrapper">
-            <input class="file-path validate" type="text">
-        </div>
-    </div>
-    {%- else %}
-    <div class="row">
-        <div class="input-field col s8 offset-s2">
-            {{ field.label() }}
-            {% if autofocus %}
-                {{field(class='' + (' invalid' if field.errors else ''), autofocus=True)}}
-            {% else %}
-                {{field(class='' + (' invalid' if field.errors else ''))}}
-            {% endif %}
-            {%- for error in field.errors %}
-                <div class="helper-text red-text col s8 offset-s2 left-align">{{ error }}</div>
-            {%- endfor %}
-        </div>
-    </div>
-    {%- endif %}
-{% endmacro %}
-
-{% macro generate_form(form, action="", method="post", id="", novalidate=True) %}
-<div class="row">
-    <form 
-        {%- if action !="None" %} action="{{ action }}"{% endif -%}
-        {%- if method %} method="{{ method }}"{% endif -%}
-        {%- if id %}id="{{ id }}"{% endif -%}
-        {%- if novalidate %}novalidate{% endif -%}
-        >
-        {{ form.hidden_tag() }}
-        {%- for field, errors in form.errors.items() %}
-            {%- if form[field].widget.input_type == 'hidden' %}
-                {%- for error in errors %}
-                    <div class="red-text row">{{ error }}</div>
-                {%- endfor -%}
-            {%- endif %}
-        {%- endfor %}
-        {% set ns = namespace(first_field=true) %}
-        {%- for field in form %}
-            {% if field.widget.input_type != 'hidden' -%}
-                {{ form_field(field, ns.first_field) }}
-                {% set ns.first_field = false %}
-            {%- endif %}
-        {%- endfor %}
-    </form>
-</div>
-{% endmacro %}
->>>>>>> e9bcf8c0bac52aec637b2ab6d5a964d8dcd9ee06
