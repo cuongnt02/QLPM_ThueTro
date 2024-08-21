@@ -26,7 +26,7 @@ def load_user(id):
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     username: Mapped[str] = mapped_column(String(50), index=True, unique=True)
     email: Mapped[str] = mapped_column(String(150), index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
@@ -59,7 +59,7 @@ class User(UserMixin, db.Model):
 class Motel(db.Model):
     __tablename__ = "motels"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     address: Mapped[str] = mapped_column(String(200))
     max_room: Mapped[int] = mapped_column(Integer)
 
@@ -72,7 +72,7 @@ class Motel(db.Model):
 class Room(db.Model):
     __tablename__ = "rooms"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     room_name: Mapped[str] = mapped_column(String(100))
     base_price: Mapped[float] = mapped_column(Float)
     description: Mapped[Optional[str]] = mapped_column(Text)
@@ -94,7 +94,7 @@ class Room(db.Model):
 class Post(db.Model):
     __tablename__ = "posts"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[str] = mapped_column(Text)
     timestamp: Mapped[datetime] = mapped_column(
@@ -114,7 +114,7 @@ class Post(db.Model):
 class Booking(db.Model):
     __tablename__ = "bookings"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     start_date: Mapped[datetime] = mapped_column()
     end_date: Mapped[datetime] = mapped_column()
     total_price: Mapped[float] = mapped_column(Float)
@@ -133,7 +133,7 @@ class Booking(db.Model):
 class Review(db.Model):
     __tablename__ = "reviews"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     rating: Mapped[int] = mapped_column(Integer)
     comment: Mapped[Optional[str]] = mapped_column(Text)
 
@@ -146,11 +146,12 @@ class Review(db.Model):
     def __repr__(self):
         return f'<Review {self.rating}>'
 
+
 # Payment model
 class Payment(db.Model):
     __tablename__ = "payments"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     amount: Mapped[float] = mapped_column(Float)
     status: Mapped[str] = mapped_column(String(20), default='Pending')
 
@@ -160,11 +161,12 @@ class Payment(db.Model):
     def __repr__(self):
         return f'<Payment {self.id}>'
 
+
 # Message model
 class Message(db.Model):
     __tablename__ = "messages"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
     content: Mapped[str] = mapped_column(Text)
 
     sender_id: Mapped[str] = mapped_column(ForeignKey(User.id))
