@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms import FileField
+from wtforms import FileField, TextAreaField
 from wtforms.validators import DataRequired, Email, Optional, Length
 from wtforms.validators import EqualTo, ValidationError
 from app.models import User
@@ -58,3 +58,8 @@ class UserEditForm(FlaskForm):
             User.email == email.data))
         if email is not None:
             raise ValidationError('Email đã tồn tại')
+
+
+class CommentForm(FlaskForm):
+    content = TextAreaField('Điền bình luận', validators=[DataRequired()])
+    submit = SubmitField('Lưu')

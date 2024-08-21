@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from app import app, db
 from app.models import User, Post, Motel
-from app.forms import LoginForm, RegisterForm, UserEditForm
+from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 
 
 @app.route('/')
@@ -71,6 +71,15 @@ def post(post_id):
     post = db.session.scalar(select(Post).where(Post.id == post_id))
     return render_template("post_info.html",
                            title="Bài viết", post=post)
+
+
+@app.route("/post/<post_id>/comment", methods=['GET', 'POST'])
+@login_required
+def comment(post_id):
+    form = CommentForm()
+    post = db.session.scalar(select(Post).where(Post.id == post_id))
+    return render_template("comment.html", title="Bình luận", form=form,
+                           post=post)
 
 
 @app.route("/motel/<motel_id>", methods=['GET'])

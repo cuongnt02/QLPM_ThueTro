@@ -1,4 +1,4 @@
-{% macro form_field(field, autofocus) %}
+{% macro form_field(field, autofocus, disabled=False) %}
     {%- if field.type == 'BooleanField' %}
     <div class="row">
         <label>
@@ -9,6 +9,14 @@
     {%- elif (field.type == 'SubmitField') %}
     <div class="row col s12 center">
     {{ field(class="btn waves-effect waves-light row blue lighten-1")}}
+    </div>
+    {%- elif (field.type == 'TextAreaField') %}
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">mode_edit</i>
+        {{ field(class="materialize-textarea", id="icon_prefix2") }}
+        <label for="icon_prefix2">{{ field.label.text }}</label>
+      </div>
     </div>
     {%- elif (field.type == 'FileField') %}
     <div class="file-field input-field col s8 offset-s2">
@@ -25,9 +33,9 @@
         <div class="input-field col s8 offset-s2">
             {{ field.label() }}
             {% if autofocus %}
-                {{field(class='' + (' invalid' if field.errors else ''), autofocus=True)}}
+                {{field(class='' + (' invalid' if field.errors else ''), autofocus=True, disabled=disabled)}}
             {% else %}
-                {{field(class='' + (' invalid' if field.errors else ''))}}
+                {{field(class='' + (' invalid' if field.errors else ''), disabled=disabled)}}
             {% endif %}
             {%- for error in field.errors %}
                 <div class="helper-text red-text col s8 offset-s2 left-align">{{ error }}</div>

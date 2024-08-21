@@ -58,6 +58,7 @@
         <div class="col s6">
             <h3>Bình luận</h3>
             <!-- comment section here  -->
+            <a class="btn" href="{{ url_for('comment', post_id=post.id) }}">Viết bình luận</a>
         </div>
     </div>
 {% endblock %}
