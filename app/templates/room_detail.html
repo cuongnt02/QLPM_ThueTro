@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ super() }} - Chi tiết phòng
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ room.room_name }}</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Hình ảnh phòng -->
+            <div id="roomImages" class="carousel slide">
+                <div class="carousel-inner">
+                    {% if room.picture %}
+                        <div class="carousel-item active">
+                            <img src="{{ room.picture }}" class="d-block w-100" alt="{{ room.room_name }}">
+                        </div>
+                    {% else %}
+                        <div class="carousel-item active">
+                            <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Hình ảnh mặc định">
+                        </div>
+                    {% endif %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#roomImages" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#roomImages" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2>Thông tin chi tiết</h2>
+            <ul class="list-unstyled">
+                <li><strong>Giá cơ bản:</strong> {{ room.base_price|floatformat:0 }} VND</li>
+                <li><strong>Giá nước:</strong> {{ room.water_price|floatformat:0 }} VND</li>
+                <li><strong>Giá điện:</strong> {{ room.electric_price|floatformat:0 }} VND</li>
+                <li><strong>Địa chỉ:</strong> {{ room.motel.address }}</li>
+                <li><strong>Mô tả:</strong> {{ room.description }}</li>
+            </ul>
+            <a href="{{ url_for('booking', room_id=room.id) }}" class="btn btn-primary">Đặt phòng</a>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Đánh giá</h3>
+    <div class="row">
+        {% for review in room.reviews %}
+            <div class="col-md-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Đánh giá của {{ review.user.full_name }}</h5>
+                        <p class="card-text">{{ review.comment }}</p>
+                        <p class="card-text"><small class="text-muted">Rating: {{ review.rating }}</small></p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>Chưa có đánh giá nào.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

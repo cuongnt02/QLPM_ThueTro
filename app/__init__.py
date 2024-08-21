@@ -4,8 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_admin import Admin
-from flask_admin.theme import Bootstrap4Theme
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -13,7 +11,8 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
-admin = Admin(app, name='THUETRO ADMIN',
-              theme=Bootstrap4Theme(swatch='cyborg'))
+
+# Initialize Flask-Admin with Bootstrap 4 theme
+admin = Admin(app, name='THUETRO ADMIN', template_mode='bootstrap4')
 
 from app import routes, models, admin_config
