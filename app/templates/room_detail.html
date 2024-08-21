@@ -36,9 +36,9 @@
         <div class="col-md-6">
             <h2>Thông tin chi tiết</h2>
             <ul class="list-unstyled">
-                <li><strong>Giá cơ bản:</strong> {{ room.base_price|floatformat:0 }} VND</li>
-                <li><strong>Giá nước:</strong> {{ room.water_price|floatformat:0 }} VND</li>
-                <li><strong>Giá điện:</strong> {{ room.electric_price|floatformat:0 }} VND</li>
+                <li><strong>Giá cơ bản:</strong> {{ '%0.2f'|format(room.base_price|float) }} VND</li>
+                <li><strong>Giá nước:</strong> {{ '%0.2f'|format(room.water_price|float) }} VND</li>
+                <li><strong>Giá điện:</strong> {{ '%0.2f'|format(room.electric_price|float) }} VND</li>
                 <li><strong>Địa chỉ:</strong> {{ room.motel.address }}</li>
                 <li><strong>Mô tả:</strong> {{ room.description }}</li>
             </ul>
@@ -48,19 +48,21 @@
 
     <h3 class="mt-4">Đánh giá</h3>
     <div class="row">
-        {% for review in room.reviews %}
-            <div class="col-md-12 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Đánh giá của {{ review.user.full_name }}</h5>
-                        <p class="card-text">{{ review.comment }}</p>
-                        <p class="card-text"><small class="text-muted">Rating: {{ review.rating }}</small></p>
+        {% if room.reviews|length %}
+            {% for review in room.reviews %}
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Đánh giá của {{ review.user.full_name }}</h5>
+                            <p class="card-text">{{ review.comment }}</p>
+                            <p class="card-text"><small class="text-muted">Rating: {{ review.rating }}</small></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% empty %}
+            {% endfor %}
+        {% else %}
             <p>Chưa có đánh giá nào.</p>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

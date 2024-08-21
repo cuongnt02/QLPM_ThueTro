@@ -6,7 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 
 from app import app, db
-from app.models import User, Post, Motel
+from app.models import User, Post, Motel, Room
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 
 
@@ -73,6 +73,13 @@ def post(post_id):
                            title="Bài viết", post=post)
 
 
+@app.route("/room/<room_id>", methods=['GET'])
+def room(room_id):
+    room = db.session.scalar(select(Room).where(Room.id == room_id))
+    return render_template("room_detail.html",
+                           title="Chi tiết phòng", room=room)
+
+
 @app.route("/post/<post_id>/comment", methods=['GET', 'POST'])
 @login_required
 def comment(post_id):
@@ -114,3 +121,18 @@ def user_edit(username):
 @app.route("/about", methods=['GET'])
 def about():
     return "about_page"
+
+
+@app.route("/contracts", methods=['GET'])
+def contract():
+    return render_template("contracts.html")
+
+
+@app.route("/booking", methods=['GET'])
+def booking():
+    return render_template("booking.html")
+
+
+@app.route("/receipt", methods=['GET'])
+def receipt():
+    return render_template("receipt.html")

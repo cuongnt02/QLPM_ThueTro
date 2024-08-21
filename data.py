@@ -106,9 +106,9 @@ if __name__ == "__main__":
         db.session.commit()
 
         # Tạo rooms
-        r1 = create_room(m1.id, "Phòng 101", 2000000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 100000, 100000)
-        r2 = create_room(m1.id, "Phòng 102", 2500000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 150000, 150000)
-        r3 = create_room(m2.id, "Phòng 201", 3000000, "Phòng rộng, tiện nghi.", 120000, 120000)
+        r1 = create_room("Phòng 101", 2000000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 100000, 100000, m1.id)
+        r2 = create_room("Phòng 102", 2500000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 150000, 150000, m1.id)
+        r3 = create_room("Phòng 201", 3000000, "Phòng rộng, tiện nghi.", 120000, 120000, m2.id)
         db.session.add_all([r1, r2, r3])
         db.session.commit()
 
