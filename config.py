@@ -10,3 +10,6 @@ class Config:
         % quote('123456'))
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     DEBUG = True
+    CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY') or ''
+    CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET') or ''
+    CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME') or ''

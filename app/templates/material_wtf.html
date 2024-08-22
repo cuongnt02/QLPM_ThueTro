@@ -22,7 +22,7 @@
     <div class="file-field input-field col s8 offset-s2">
         <div class="btn">
             <span>Upload Avatar</span>
-            {{ field() }}
+            {{ field(accept=".png,.jpg") }}
         </div>
         <div class="file-path-wrapper">
             <input class="file-path validate" type="text">
@@ -45,14 +45,15 @@
     {%- endif %}
 {% endmacro %}
 
-{% macro generate_form(form, action="", method="post", id="", novalidate=True) %}
+{% macro generate_form(form, action="", method="post", id="", novalidate=True, media=False) %}
 <div class="row">
     <form 
         class="col s12" 
         {%- if action !="None" %} action="{{ action }}"{% endif -%}
         {%- if method %} method="{{ method }}"{% endif -%}
-        {%- if id %}id="{{ id }}"{% endif -%}
-        {%- if novalidate %}novalidate{% endif -%}
+        {%- if id %} id="{{ id }}"{% endif -%}
+        {%- if novalidate %} novalidate{% endif -%}
+        {%- if media %} enctype="multipart/form-data"{% endif -%}
         >
         {{ form.hidden_tag() }}
         {%- for field, errors in form.errors.items() %}

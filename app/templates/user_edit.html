@@ -23,7 +23,7 @@
     <div class="row">
         <div class="row col s12">
             <h3 class="center row col s12">Sửa thông tin</h3>
-            {{ wtf.generate_form(form=form, action=url_for('user_edit', username=user.username)) }}
+            {{ wtf.generate_form(form=form, action=url_for('user_edit', username=user.username), media=True) }}
         </div>
     </div>
 {% endblock %}

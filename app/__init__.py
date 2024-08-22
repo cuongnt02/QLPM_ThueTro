@@ -5,6 +5,8 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_admin import Admin
 from flask_admin.theme import Bootstrap4Theme
+from flask_wtf.csrf import CSRFProtect
+import cloudinary
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,9 +14,14 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
+csrf = CSRFProtect(app)
 
 # Initialize Flask-Admin with Bootswatch theme (pull from github new version)
 admin = Admin(app, name='THUETRO ADMIN',
               theme=Bootstrap4Theme(swatch='cyborg'))
+
+cloudinary.config(cloud_name=app.config.get("CLOUDINARY_CLOUD_NAME"),
+                  api_key=app.config.get("CLOUDINARY_API_KEY"),
+                  api_secret=app.config.get("CLOUDINARY_API_SECRET"))
 
 from app import routes, models, admin_config
