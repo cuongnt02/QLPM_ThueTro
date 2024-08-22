@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms import FileField, TextAreaField
+from wtforms import TextAreaField, FileField
 from wtforms.validators import DataRequired, Email, Optional, Length
 from wtforms.validators import EqualTo, ValidationError
 from app.models import User
@@ -44,20 +44,8 @@ class UserEditForm(FlaskForm):
     full_name = StringField('Họ Tên', validators=[DataRequired()])
     phone_number = StringField('SDT', validators=[Optional(), Length(10, 11)])
     address = StringField('Địa chỉ', validators=[Optional()])
-    avatar = FileField('Avatar', validators=[Optional()])
+    avatar = FileField('Avatar')
     submit = SubmitField('Lưu thông tin')
-
-    def validate_username(self, username):
-        user = db.session.scalar(select(User).where(
-            User.username == username.data))
-        if user is not None:
-            raise ValidationError('Tên tài khoản đã tồn tại')
-
-    def validate_email(self, email):
-        email = db.session.scalar(select(User).where(
-            User.email == email.data))
-        if email is not None:
-            raise ValidationError('Email đã tồn tại')
 
 
 class CommentForm(FlaskForm):

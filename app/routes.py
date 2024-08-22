@@ -4,6 +4,7 @@ from werkzeug.datastructures import MultiDict
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
+from cloudinary import uploader
 
 from app import app, db
 from app.models import User, Post, Motel, Room
@@ -103,11 +104,11 @@ def user(username):
     return render_template("user.html", user=user)
 
 
-@app.route("/user/<username>/edit")
+@app.route("/user/<username>/edit", methods=['GET', 'POST'])
 @login_required
 def user_edit(username):
     user = db.first_or_404(select(User).where(User.username == username))
-    form = UserEditForm(formdata=MultiDict(
+    form = UserEditForm(data=MultiDict(
         {
             'username': user.username,
             'email': user.email,
@@ -115,6 +116,23 @@ def user_edit(username):
             'phone_number': user.phone_number,
             'address': user.address,
         }))
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.full_name = form.full_name.data
+        current_user.phone_number = form.phone_number.data
+        current_user.address = form.address.data
+        avatar_path = None
+
+        if form.avatar.data:
+            image = request.files[form.avatar.name]
+            if image:
+                response = uploader.upload(image)
+                avatar_path = response['secure_url']
+                current_user.avatar = avatar_path
+        db.session.commit()
+        flash('Thông tin đã được lưu')
+        return redirect(url_for('user', username=username))
     return render_template("user_edit.html", user=user, form=form)
 
 
