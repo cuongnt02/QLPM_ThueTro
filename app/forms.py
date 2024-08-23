@@ -51,3 +51,13 @@ class UserEditForm(FlaskForm):
 class CommentForm(FlaskForm):
     content = TextAreaField('Điền bình luận', validators=[DataRequired()])
     submit = SubmitField('Lưu')
+
+
+class MotelEditForm(FlaskForm):
+    address = StringField('Địa chỉ', validators=[DataRequired()])
+    submit = SubmitField('Lưu thông tin')
+
+
+class MotelCreateForm(FlaskForm):
+    address = StringField('Địa chỉ', validators=[DataRequired()])
+    submit = SubmitField('Tạo phòng')
