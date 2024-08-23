@@ -1,14 +1,14 @@
 from urllib.parse import urlsplit
 from uuid import uuid4
-from werkzeug.datastructures import MultiDict
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 from cloudinary import uploader
 
 from app import app, db
-from app.models import User, Post, Motel, Room
+from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
+from app.utils import require_roles
 
 
 @app.route('/')
@@ -90,6 +90,13 @@ def comment(post_id):
                            post=post)
 
 
+@app.route("/motel/manage", methods=['GET'])
+@login_required
+@require_roles(UserRole.OWNER)
+def manage_motel():
+    return "manage motel"
+
+
 @app.route("/motel/<motel_id>", methods=['GET'])
 def motel(motel_id):
     motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
@@ -108,14 +115,7 @@ def user(username):
 @login_required
 def user_edit(username):
     user = db.first_or_404(select(User).where(User.username == username))
-    form = UserEditForm(data=MultiDict(
-        {
-            'username': user.username,
-            'email': user.email,
-            'full_name': user.full_name,
-            'phone_number': user.phone_number,
-            'address': user.address,
-        }))
+    form = UserEditForm()
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.email = form.email.data
@@ -133,6 +133,12 @@ def user_edit(username):
         db.session.commit()
         flash('Thông tin đã được lưu')
         return redirect(url_for('user', username=username))
+    elif request.method == 'GET':
+        form.username.data = user.username
+        form.email.data = user.email
+        form.full_name.data = user.full_name
+        form.phone_number.data = user.phone_number
+        form.address.data = user.address
     return render_template("user_edit.html", user=user, form=form)
 
 

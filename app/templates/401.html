@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    {{ super() }}
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block header %}
+    {% block nav %}
+        {{ super() }}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    <h1>Bạn chưa có quyền truy cập trang web này</h1>
+    <p>Hãy đăng nhập hoặc đăng kí để có thể truy cập</p>
+    <a class="btn" href="{{ url_for('home') }}">Trở về</a>
+{% endblock %}
+
