@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    {{ super() }}
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block header %}
+    {% block nav %}
+        {{ super() }}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    <h1>Quyền truy cập bị hạn chế</h1>
+    <p>Bạn đang truy cập trang web bị hạn chế trên quyền truy cập của bạn.Hãy đảm bảo bạn có đủ quyền để truy cập trang web này</p>
+    <a class="btn" href="{{ url_for('home') }}">Trở về</a>
+{% endblock %}

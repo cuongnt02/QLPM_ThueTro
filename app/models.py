@@ -16,7 +16,7 @@ from app import db, login
 class UserRole(RoleEnum):
     USER = 1
     ADMIN = 2
-    LANDLORD = 3
+    OWNER = 3
 
 
 # User loader function for Flask-Login
