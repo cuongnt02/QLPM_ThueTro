@@ -1,6 +1,6 @@
 from urllib.parse import urlsplit
 from uuid import uuid4
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 from cloudinary import uploader
@@ -8,6 +8,7 @@ from cloudinary import uploader
 from app import app, db
 from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
+from app.forms import MotelEditForm
 from app.utils import require_roles
 
 
@@ -81,6 +82,30 @@ def room(room_id):
                            title="Chi tiết phòng", room=room)
 
 
+@app.route("/room/<room_id>/edit", methods=['GET'])
+def edit_room(room_id):
+    room = db.session.scalar(select(Room).where(Room.id == room_id))
+    return render_template("room_edit.html", title="Chỉnh sửa phòng",
+                           room=room)
+
+
+@app.route("/motel/<motel_id>/create", methods=['GET', 'POST'])
+def create_room(motel_id):
+    return render_template("room_create.html", title="Tạo phòng")
+
+
+@app.route("/motel/delete/<motel_id>", methods=['DELETE'])
+def delete_motel(motel_id):
+    motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
+    print('REQUESTED MOTEL', motel.address)
+    if motel:
+        db.session.delete(motel)
+        db.session.commit()
+        return jsonify({'message': 'Motel deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Motel not exist'}), 404
+
+
 @app.route("/post/<post_id>/comment", methods=['GET', 'POST'])
 @login_required
 def comment(post_id):
@@ -92,9 +117,36 @@ def comment(post_id):
 
 @app.route("/motel/manage", methods=['GET'])
 @login_required
-@require_roles(UserRole.OWNER)
+@require_roles(UserRole.LANDLORD)
 def manage_motel():
-    return "manage motel"
+    motels = db.session.scalars(select(Motel))
+    return render_template("motels.html", title="Quản lý phòng trọ",
+                           motels=motels)
+
+
+@app.route("/motel/<motel_id>/edit", methods=['GET', 'POST'])
+@login_required
+@require_roles(UserRole.LANDLORD)
+def edit_motel(motel_id):
+    form = MotelEditForm()
+    motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
+    if form.validate_on_submit():
+        motel.address = form.address.data
+        db.session.add(motel)
+        db.session.commit()
+        flash("Chỉnh sửa nhà trọ thành công")
+        return redirect(url_for('manage_motel'))
+    elif request.method == 'GET':
+        form.address.data = motel.address
+    return render_template("motel_edit.html", title="Chỉnh sửa nhà trọ",
+                           motel=motel, form=form)
+
+
+@app.route("/motel/create", methods=['GET', 'POST'])
+@login_required
+@require_roles(UserRole.LANDLORD)
+def create_motel():
+    return render_template("motel_create.html", title="Tạo nhà trọ")
 
 
 @app.route("/motel/<motel_id>", methods=['GET'])
@@ -102,6 +154,14 @@ def motel(motel_id):
     motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
     return render_template("motel_info.html",
                            title="Thông tin nhà trọ", motel=motel)
+
+
+@app.route("/user/<username>/create")
+@login_required
+@require_roles(UserRole.LANDLORD)
+def create_post(username):
+    user = db.first_or_404(select(User).where(User.username == username))
+    return render_template("post_create.html", user=user)
 
 
 @app.route("/user/<username>")

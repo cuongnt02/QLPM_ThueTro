@@ -16,7 +16,7 @@ from app import db, login
 class UserRole(RoleEnum):
     USER = 1
     ADMIN = 2
-    OWNER = 3
+    LANDLORD = 3
 
 
 # User loader function for Flask-Login
@@ -38,7 +38,7 @@ class User(UserMixin, db.Model):
     phone_number: Mapped[Optional[str]] = mapped_column(String(12))
     address: Mapped[Optional[str]] = mapped_column(String(200))
     avatar: Mapped[Optional[str]] = mapped_column(String(256))
-    user_role: Mapped[UserRole] = mapped_column(Enum(UserRole),
+    user_role: Mapped[UserRole] = mapped_column(Enum(UserRole, length=255),
                                                 default=UserRole.USER)
 
     posts: Mapped[List['Post']] = relationship(back_populates='author')
@@ -70,7 +70,8 @@ class Motel(db.Model):
     address: Mapped[str] = mapped_column(String(200))
     max_room: Mapped[int] = mapped_column(Integer)
 
-    rooms: Mapped[List['Room']] = relationship(back_populates="motel")
+    rooms: Mapped[List['Room']] = relationship(back_populates="motel",
+                                               cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Motel {self.address}>'
@@ -92,8 +93,8 @@ class Room(db.Model):
     motel_id: Mapped[str] = mapped_column(ForeignKey(Motel.id))
     motel: Mapped['Motel'] = relationship(back_populates="rooms")
 
-    posts: Mapped[List['Post']] = relationship(back_populates="room")
-    # bookings: Mapped[List['Booking']] = relationship(back_populates="room")
+    posts: Mapped[List['Post']] = relationship(back_populates="room", cascade="all, delete-orphan")
+    bookings: Mapped[List['Booking']] = relationship(back_populates="room")
     reviews: Mapped[List['Review']] = relationship(back_populates="room")
 
     def __repr__(self):
@@ -122,24 +123,25 @@ class Post(db.Model):
     def __repr__(self):
         return f'<Post {self.title}>'
 
+
 # Booking model
-# class Booking(db.Model):
-#     __tablename__ = "bookings"
-# 
-#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-#     start_date: Mapped[datetime] = mapped_column()
-#     end_date: Mapped[datetime] = mapped_column()
-#     total_price: Mapped[float] = mapped_column(Float)
-#     status: Mapped[str] = mapped_column(String(20), default='Pending')
-# 
-#     user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
-#     room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
-# 
-#     user: Mapped['User'] = relationship(back_populates="bookings")
-#     room: Mapped['Room'] = relationship(back_populates="bookings")
-# 
-#     def __repr__(self):
-#         return f'<Booking {self.id}>'
+class Booking(db.Model):
+    __tablename__ = "bookings"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    start_date: Mapped[datetime] = mapped_column()
+    end_date: Mapped[datetime] = mapped_column()
+    total_price: Mapped[float] = mapped_column(Float)
+    status: Mapped[str] = mapped_column(String(20), default='Pending')
+
+    # user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+    room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
+
+    # user: Mapped['User'] = relationship(back_populates="bookings")
+    room: Mapped['Room'] = relationship(back_populates="bookings")
+
+    def __repr__(self):
+        return f'<Booking {self.id}>'
 
 
 # Review model
