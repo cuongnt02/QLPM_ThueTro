@@ -21,7 +21,19 @@ def home():
                 Post.title.like('%{}%'.format(keyword)))).all()
     return render_template('home.html', title="Trang chủ", posts=posts)
 
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('q')
+    # Implement your search logic here
+    # For now, we just render a template with the search query
+    return render_template('search_results.html', query=query)
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+@app.route('/properties')
+def properties():
+    return render_template('properties.html')
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:

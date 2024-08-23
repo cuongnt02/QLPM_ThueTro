@@ -1,50 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Your rental application description here">
-    <title>{% block title %}My Rental App{% endblock %}</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="description" content="Find the best rental properties easily with our platform.">
+    <title>{% block title %}Rental App{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Style.css') }}">
+
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     {% block css %}{% endblock %}
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="{{ url_for('home') }}">Rental App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<!-- Header with Navigation Bar -->
+<header class="bg-dark text-white">
+    <div class="container">
+        <div class="d-flex justify-content-between py-2">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand text-white" href="{{ url_for('home') }}">Rent Home</a>
+            </div>
+            <div class="d-flex align-items-center">
+                <form class="d-flex" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control me-2" type="search" placeholder="Search rentals" aria-label="Search"
+                           name="q">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('about') }}">About</a>
                     </li>
-                    <!-- Add more navigation items as needed -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('properties') }}">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link login-link" href="{{ url_for('login') }}">Đăng Nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link register-link" href="{{ url_for('register') }}">Đăng Ký</a>
+                    </li>
                 </ul>
             </div>
-        </nav>
-    </header>
 
-    <main role="main" class="container mt-4">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="bg-light py-4 mt-4">
-        <div class="container">
-            <p class="text-center mb-0">© 2024 Rental App. All rights reserved.</p>
         </div>
-    </footer>
+    </nav>
+</header>
 
-    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
-    <script src="{{ url_for('static', filename="js/materialize.min.js")}}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
-    {% block js %}{% endblock %}
+<!-- Main Content Area -->
+<main role="main" class="container mt-5">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer Section -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <!-- Footer Column 1 -->
+            <div class="col-md-4">
+                <h5>About RentalApp</h5>
+                <p>RentalApp helps you find the best rental properties. Whether you're looking for a house, apartment,
+                    or room, we have the perfect place for you.</p>
+                <p><a href="{{ url_for('about') }}" class="text-white">Learn more</a></p>
+            </div>
+            <!-- Footer Column 2 -->
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('home') }}" class="text-white">Home</a></li>
+                    <li><a href="{{ url_for('properties') }}" class="text-white">Properties</a></li>
+                    <li><a href="{{ url_for('about') }}" class="text-white">About Us</a></li>
+                    <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
+                </ul>
+            </div>
+            <!-- Footer Column 3 -->
+            <div class="col-md-4">
+                <h5>Follow Us</h5>
+                <p>Stay connected with us on social media.</p>
+                <div>
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p class="mb-0">© 2024 Rental App. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block js %}{% endblock %}
 </body>
+
 </html>
