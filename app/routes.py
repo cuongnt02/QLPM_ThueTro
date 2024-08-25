@@ -1,13 +1,15 @@
 from urllib.parse import urlsplit
 from uuid import uuid4
-from werkzeug.datastructures import MultiDict
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
+from cloudinary import uploader
 
 from app import app, db
-from app.models import User, Post, Motel
+from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
+from app.forms import MotelEditForm
+from app.utils import require_roles
 
 
 @app.route('/')
@@ -21,19 +23,7 @@ def home():
                 Post.title.like('%{}%'.format(keyword)))).all()
     return render_template('home.html', title="Trang chủ", posts=posts)
 
-@app.route('/search', methods=['GET'])
-def search():
-    query = request.args.get('q')
-    # Implement your search logic here
-    # For now, we just render a template with the search query
-    return render_template('search_results.html', query=query)
 
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-@app.route('/properties')
-def properties():
-    return render_template('properties.html')
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -85,6 +75,37 @@ def post(post_id):
                            title="Bài viết", post=post)
 
 
+@app.route("/room/<room_id>", methods=['GET'])
+def room(room_id):
+    room = db.session.scalar(select(Room).where(Room.id == room_id))
+    return render_template("room_detail.html",
+                           title="Chi tiết phòng", room=room)
+
+
+@app.route("/room/<room_id>/edit", methods=['GET'])
+def edit_room(room_id):
+    room = db.session.scalar(select(Room).where(Room.id == room_id))
+    return render_template("room_edit.html", title="Chỉnh sửa phòng",
+                           room=room)
+
+
+@app.route("/motel/<motel_id>/create", methods=['GET', 'POST'])
+def create_room(motel_id):
+    return render_template("room_create.html", title="Tạo phòng")
+
+
+@app.route("/motel/delete/<motel_id>", methods=['DELETE'])
+def delete_motel(motel_id):
+    motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
+    print('REQUESTED MOTEL', motel.address)
+    if motel:
+        db.session.delete(motel)
+        db.session.commit()
+        return jsonify({'message': 'Motel deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Motel not exist'}), 404
+
+
 @app.route("/post/<post_id>/comment", methods=['GET', 'POST'])
 @login_required
 def comment(post_id):
@@ -94,11 +115,53 @@ def comment(post_id):
                            post=post)
 
 
+@app.route("/motel/manage", methods=['GET'])
+@login_required
+@require_roles(UserRole.LANDLORD)
+def manage_motel():
+    motels = db.session.scalars(select(Motel))
+    return render_template("motels.html", title="Quản lý phòng trọ",
+                           motels=motels)
+
+
+@app.route("/motel/<motel_id>/edit", methods=['GET', 'POST'])
+@login_required
+@require_roles(UserRole.LANDLORD)
+def edit_motel(motel_id):
+    form = MotelEditForm()
+    motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
+    if form.validate_on_submit():
+        motel.address = form.address.data
+        db.session.add(motel)
+        db.session.commit()
+        flash("Chỉnh sửa nhà trọ thành công")
+        return redirect(url_for('manage_motel'))
+    elif request.method == 'GET':
+        form.address.data = motel.address
+    return render_template("motel_edit.html", title="Chỉnh sửa nhà trọ",
+                           motel=motel, form=form)
+
+
+@app.route("/motel/create", methods=['GET', 'POST'])
+@login_required
+@require_roles(UserRole.LANDLORD)
+def create_motel():
+    return render_template("motel_create.html", title="Tạo nhà trọ")
+
+
 @app.route("/motel/<motel_id>", methods=['GET'])
 def motel(motel_id):
     motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
     return render_template("motel_info.html",
                            title="Thông tin nhà trọ", motel=motel)
+
+
+@app.route("/user/<username>/create")
+@login_required
+@require_roles(UserRole.LANDLORD)
+def create_post(username):
+    user = db.first_or_404(select(User).where(User.username == username))
+    return render_template("post_create.html", user=user)
 
 
 @app.route("/user/<username>")
@@ -108,21 +171,52 @@ def user(username):
     return render_template("user.html", user=user)
 
 
-@app.route("/user/<username>/edit")
+@app.route("/user/<username>/edit", methods=['GET', 'POST'])
 @login_required
 def user_edit(username):
     user = db.first_or_404(select(User).where(User.username == username))
-    form = UserEditForm(formdata=MultiDict(
-        {
-            'username': user.username,
-            'email': user.email,
-            'full_name': user.full_name,
-            'phone_number': user.phone_number,
-            'address': user.address,
-        }))
+    form = UserEditForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.full_name = form.full_name.data
+        current_user.phone_number = form.phone_number.data
+        current_user.address = form.address.data
+        avatar_path = None
+
+        if form.avatar.data:
+            image = request.files[form.avatar.name]
+            if image:
+                response = uploader.upload(image)
+                avatar_path = response['secure_url']
+                current_user.avatar = avatar_path
+        db.session.commit()
+        flash('Thông tin đã được lưu')
+        return redirect(url_for('user', username=username))
+    elif request.method == 'GET':
+        form.username.data = user.username
+        form.email.data = user.email
+        form.full_name.data = user.full_name
+        form.phone_number.data = user.phone_number
+        form.address.data = user.address
     return render_template("user_edit.html", user=user, form=form)
 
 
 @app.route("/about", methods=['GET'])
 def about():
     return "about_page"
+
+
+@app.route("/contracts", methods=['GET'])
+def contract():
+    return render_template("contracts.html")
+
+
+@app.route("/booking", methods=['GET'])
+def booking():
+    return render_template("booking.html")
+
+
+@app.route("/receipt", methods=['GET'])
+def receipt():
+    return render_template("receipt.html")

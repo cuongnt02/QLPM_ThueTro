@@ -11,22 +11,26 @@ from flask_login import UserMixin
 from enum import Enum as RoleEnum
 from app import db, login
 
+
 # Enum for user roles
 class UserRole(RoleEnum):
     USER = 1
     ADMIN = 2
     LANDLORD = 3
 
+
 # User loader function for Flask-Login
 @login.user_loader
 def load_user(id):
     return db.session.get(User, id)
 
+
 # User model
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=uuid4())
     username: Mapped[str] = mapped_column(String(50), index=True, unique=True)
     email: Mapped[str] = mapped_column(String(150), index=True, unique=True)
     password_hash: Mapped[Optional[str]] = mapped_column(String(256))
@@ -34,16 +38,17 @@ class User(UserMixin, db.Model):
     phone_number: Mapped[Optional[str]] = mapped_column(String(12))
     address: Mapped[Optional[str]] = mapped_column(String(200))
     avatar: Mapped[Optional[str]] = mapped_column(String(256))
-    user_role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER)
+    user_role: Mapped[UserRole] = mapped_column(Enum(UserRole, length=255),
+                                                default=UserRole.USER)
 
     posts: Mapped[List['Post']] = relationship(back_populates='author')
-    bookings: Mapped[List['Booking']] = relationship(back_populates='user')
-    messages_sent: Mapped[List['Message']] = relationship(
-        foreign_keys='Message.sender_id', back_populates='sender'
-    )
-    messages_received: Mapped[List['Message']] = relationship(
-        foreign_keys='Message.receiver_id', back_populates='receiver'
-    )
+    # bookings: Mapped[List['Booking']] = relationship(back_populates='user')
+    # messages_sent: Mapped[List['Message']] = relationship(
+    #     foreign_keys='Message.sender_id', back_populates='sender'
+    # )
+    # messages_received: Mapped[List['Message']] = relationship(
+    #     foreign_keys='Message.receiver_id', back_populates='receiver'
+    # )
     reviews: Mapped[List['Review']] = relationship(back_populates='user')
 
     def set_password(self, password):
@@ -55,24 +60,29 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+
 # Motel model
 class Motel(db.Model):
     __tablename__ = "motels"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    id: Mapped[str] = mapped_column(String(36), primary_key=True,
+                                    default=uuid4())
     address: Mapped[str] = mapped_column(String(200))
     max_room: Mapped[int] = mapped_column(Integer)
 
-    rooms: Mapped[List['Room']] = relationship(back_populates="motel")
+    rooms: Mapped[List['Room']] = relationship(back_populates="motel",
+                                               cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Motel {self.address}>'
+
 
 # Room model
 class Room(db.Model):
     __tablename__ = "rooms"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    id: Mapped[str] = mapped_column(String(36), primary_key=True,
+                                    default=uuid4())
     room_name: Mapped[str] = mapped_column(String(100))
     base_price: Mapped[float] = mapped_column(Float)
     description: Mapped[Optional[str]] = mapped_column(Text)
@@ -83,22 +93,25 @@ class Room(db.Model):
     motel_id: Mapped[str] = mapped_column(ForeignKey(Motel.id))
     motel: Mapped['Motel'] = relationship(back_populates="rooms")
 
-    posts: Mapped[List['Post']] = relationship(back_populates="room")
+    posts: Mapped[List['Post']] = relationship(back_populates="room", cascade="all, delete-orphan")
     bookings: Mapped[List['Booking']] = relationship(back_populates="room")
     reviews: Mapped[List['Review']] = relationship(back_populates="room")
 
     def __repr__(self):
         return f'<Room {self.room_name}>'
 
+
 # Post model
 class Post(db.Model):
     __tablename__ = "posts"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    id: Mapped[str] = mapped_column(String(36), primary_key=True,
+                                    default=uuid4())
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[str] = mapped_column(Text)
     timestamp: Mapped[datetime] = mapped_column(
-        index=True, default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh"))
+        index=True,
+        default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh"))
     )
 
     user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
@@ -110,6 +123,7 @@ class Post(db.Model):
     def __repr__(self):
         return f'<Post {self.title}>'
 
+
 # Booking model
 class Booking(db.Model):
     __tablename__ = "bookings"
@@ -120,20 +134,22 @@ class Booking(db.Model):
     total_price: Mapped[float] = mapped_column(Float)
     status: Mapped[str] = mapped_column(String(20), default='Pending')
 
-    user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+    # user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
     room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
 
-    user: Mapped['User'] = relationship(back_populates="bookings")
+    # user: Mapped['User'] = relationship(back_populates="bookings")
     room: Mapped['Room'] = relationship(back_populates="bookings")
 
     def __repr__(self):
         return f'<Booking {self.id}>'
 
+
 # Review model
 class Review(db.Model):
     __tablename__ = "reviews"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=uuid4())
     rating: Mapped[int] = mapped_column(Integer)
     comment: Mapped[Optional[str]] = mapped_column(Text)
 
@@ -148,32 +164,32 @@ class Review(db.Model):
 
 
 # Payment model
-class Payment(db.Model):
-    __tablename__ = "payments"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-    amount: Mapped[float] = mapped_column(Float)
-    status: Mapped[str] = mapped_column(String(20), default='Pending')
-
-    booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
-    booking: Mapped['Booking'] = relationship()
-
-    def __repr__(self):
-        return f'<Payment {self.id}>'
+# class Payment(db.Model):
+#     __tablename__ = "payments"
+# 
+#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+#     amount: Mapped[float] = mapped_column(Float)
+#     status: Mapped[str] = mapped_column(String(20), default='Pending')
+# 
+#     booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
+#     booking: Mapped['Booking'] = relationship()
+# 
+#     def __repr__(self):
+#         return f'<Payment {self.id}>'
 
 
 # Message model
-class Message(db.Model):
-    __tablename__ = "messages"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-    content: Mapped[str] = mapped_column(Text)
-
-    sender_id: Mapped[str] = mapped_column(ForeignKey(User.id))
-    receiver_id: Mapped[str] = mapped_column(ForeignKey(User.id))
-
-    sender: Mapped['User'] = relationship(foreign_keys=[sender_id], back_populates="messages_sent")
-    receiver: Mapped['User'] = relationship(foreign_keys=[receiver_id], back_populates="messages_received")
-
-    def __repr__(self):
-        return f'<Message {self.id}>'
+# class Message(db.Model):
+#     __tablename__ = "messages"
+# 
+#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+#     content: Mapped[str] = mapped_column(Text)
+# 
+#     sender_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+#     receiver_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+# 
+#     sender: Mapped['User'] = relationship(foreign_keys=[sender_id], back_populates="messages_sent")
+#     receiver: Mapped['User'] = relationship(foreign_keys=[receiver_id], back_populates="messages_received")
+# 
+#     def __repr__(self):
+#         return f'<Message {self.id}>'

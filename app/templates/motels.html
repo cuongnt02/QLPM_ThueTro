@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ super() }} - Trang Chủ
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Danh sách nhà trọ</h1>
+
+    {% if motels %}
+    {% for motel in motels %}
+    <div class="card mb-3" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+            <img src="{{motel.picture}}" class="card-img" alt="Motel image">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">Nhà trọ tại {{motel.address}}</h5>
+            <a href="{{ url_for('edit_motel', motel_id=motel.id) }}" class="btn btn-primary">Chỉnh sửa</a>
+            <button class="btn btn-danger" onclick="deleteMotel('{{url_for('delete_motel', motel_id=motel.id) }}');">Xóa</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>Chưa có phòng trọ</p>
+    {% endif %}
+    <a class="btn btn-primary" href="{{ url_for('create_motel') }}">Tạo nhà trọ</a>
+</div>
+{% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/delete_motel.js')}}"></script>
+{% endblock %}

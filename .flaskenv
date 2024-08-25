@@ -1,2 +1,6 @@
 FLASK_APP=index.py
-DATABASE_URI=mysql+pymysql://root:123456@localhost/thuetro?charset=utf8mb4
+FLASK_DEBUG=1
+DATABASE_URI=mysql+pymysql://root:0308110299Go@localhost/thuetro?charset=utf8mb4
+CLOUDINARY_API_KEY=532785622578897
+CLOUDINARY_API_SECRET=gPM8-kgK_p-9ADX4eKGUNec0J6g
+CLOUDINARY_CLOUD_NAME=dag3mcswq

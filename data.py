@@ -2,7 +2,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 import pytz
 from app import app, db
-from app.models import User, Motel, Room, Post, Booking, Review, Payment, Message
+from app.models import User, Motel, Room, Post, Review
 from sqlalchemy.exc import IntegrityError
 
 def create_user(username, email, full_name, password, role):
@@ -23,7 +23,8 @@ def create_motel(address, max_room):
         max_room=max_room
     )
 
-def create_room(motel_id, room_name, base_price, description, water_price, electric_price, picture=""):
+def create_room(room_name, base_price, description, water_price,
+                electric_price, motel_id, picture=""):
     return Room(
         id=uuid4(),
         room_name=room_name,
@@ -46,15 +47,15 @@ def create_post(title, content, user_id, room_id, timezone):
         room_id=room_id
     )
 
-def create_booking(user_id, room_id, start_date, end_date, total_price):
-    return Booking(
-        id=uuid4(),
-        start_date=start_date,
-        end_date=end_date,
-        total_price=total_price,
-        user_id=user_id,
-        room_id=room_id
-    )
+# def create_booking(user_id, room_id, start_date, end_date, total_price):
+#     return Booking(
+#         id=uuid4(),
+#         start_date=start_date,
+#         end_date=end_date,
+#         total_price=total_price,
+#         user_id=user_id,
+#         room_id=room_id
+#     )
 
 def create_review(user_id, room_id, rating, comment):
     return Review(
@@ -65,21 +66,22 @@ def create_review(user_id, room_id, rating, comment):
         room_id=room_id
     )
 
-def create_payment(booking_id, amount, status="Pending"):
-    return Payment(
-        id=uuid4(),
-        amount=amount,
-        status=status,
-        booking_id=booking_id
-    )
+# def create_payment(booking_id, amount, status="Pending"):
+#     return Payment(
+#         id=uuid4(),
+#         amount=amount,
+#         status=status,
+#         booking_id=booking_id
+#     )
 
-def create_message(sender_id, receiver_id, content):
-    return Message(
-        id=uuid4(),
-        content=content,
-        sender_id=sender_id,
-        receiver_id=receiver_id
-    )
+# def create_message(sender_id, receiver_id, content):
+#     return Message(
+#         id=uuid4(),
+#         content=content,
+#         sender_id=sender_id,
+#         receiver_id=receiver_id
+#     )
+
 
 if __name__ == "__main__":
 
@@ -106,9 +108,9 @@ if __name__ == "__main__":
         db.session.commit()
 
         # Tạo rooms
-        r1 = create_room(m1.id, "Phòng 101", 2000000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 100000, 100000)
-        r2 = create_room(m1.id, "Phòng 102", 2500000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 150000, 150000)
-        r3 = create_room(m2.id, "Phòng 201", 3000000, "Phòng rộng, tiện nghi.", 120000, 120000)
+        r1 = create_room("Phòng 101", 2000000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 100000, 100000, m1.id)
+        r2 = create_room("Phòng 102", 2500000, "Phòng trọ thoáng mát, gần siêu thị, sân bay.", 150000, 150000, m1.id)
+        r3 = create_room("Phòng 201", 3000000, "Phòng rộng, tiện nghi.", 120000, 120000, m2.id)
         db.session.add_all([r1, r2, r3])
         db.session.commit()
 
@@ -123,10 +125,10 @@ if __name__ == "__main__":
         db.session.commit()
 
         # Tạo bookings
-        b1 = create_booking(u1.id, r1.id, datetime.now(), datetime.now() + timedelta(days=30), 6000000)
-        b2 = create_booking(u2.id, r2.id, datetime.now(), datetime.now() + timedelta(days=15), 3750000)
-        db.session.add_all([b1, b2])
-        db.session.commit()
+        # b1 = create_booking(u1.id, r1.id, datetime.now(), datetime.now() + timedelta(days=30), 6000000)
+        # b2 = create_booking(u2.id, r2.id, datetime.now(), datetime.now() + timedelta(days=15), 3750000)
+        # db.session.add_all([b1, b2])
+        # db.session.commit()
 
         # Tạo reviews
         rev1 = create_review(u1.id, r1.id, 4, "Phòng tốt nhưng hơi ồn.")
@@ -135,15 +137,15 @@ if __name__ == "__main__":
         db.session.commit()
 
         # Tạo payments
-        pay1 = create_payment(b1.id, 6000000, "Paid")
-        pay2 = create_payment(b2.id, 3750000, "Pending")
-        db.session.add_all([pay1, pay2])
-        db.session.commit()
+        # pay1 = create_payment(b1.id, 6000000, "Paid")
+        # pay2 = create_payment(b2.id, 3750000, "Pending")
+        # db.session.add_all([pay1, pay2])
+        # db.session.commit()
 
         # Tạo messages
-        msg1 = create_message(u1.id, u2.id, "Xin chào, phòng còn trống không?")
-        msg2 = create_message(u2.id, u1.id, "Xin chào, phòng còn trống. Bạn muốn thuê khi nào?")
-        db.session.add_all([msg1, msg2])
-        db.session.commit()
+        # msg1 = create_message(u1.id, u2.id, "Xin chào, phòng còn trống không?")
+        # msg2 = create_message(u2.id, u1.id, "Xin chào, phòng còn trống. Bạn muốn thuê khi nào?")
+        # db.session.add_all([msg1, msg2])
+        # db.session.commit()
 
         print("Dữ liệu đã được thêm thành công!")
