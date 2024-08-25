@@ -8,14 +8,7 @@
 <div class="container">
     <h1 class="text-center mb-4">Hệ thống thuê nhà trọ uy tín</h1>
 
-    <div class="row mb-4">
-        <div class="col-md-8 offset-md-2">
-            <form class="d-flex" action="{{ url_for('home') }}" method="GET">
-                <input class="form-control me-2" type="search" placeholder="Tìm kiếm nhà trọ" aria-label="Search" name="title" required>
-                <button class="btn btn-primary" type="submit">Tìm kiếm</button>
-            </form>
-        </div>
-    </div>
+
 
     <div class="row">
         {% for post in posts %}
