@@ -97,7 +97,6 @@ def create_room(motel_id):
 @app.route("/motel/delete/<motel_id>", methods=['DELETE'])
 def delete_motel(motel_id):
     motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
-    print('REQUESTED MOTEL', motel.address)
     if motel:
         db.session.delete(motel)
         db.session.commit()

@@ -28,9 +28,9 @@
                 <a class="navbar-brand text-white" href="{{ url_for('home') }}">Rent Home</a>
             </div>
             <div class="d-flex align-items-center">
-                <form class="d-flex" action="{{ url_for('search') }}" method="GET">
+                <form class="d-flex" action="{{ url_for('home') }}" method="GET">
                     <input class="form-control me-2" type="search" placeholder="Search rentals" aria-label="Search"
-                           name="q">
+                           name="title">
                     <button class="btn btn-outline-light" type="submit">Search</button>
                 </form>
             </div>
@@ -52,10 +52,10 @@
                         <a class="nav-link" href="{{ url_for('about') }}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('properties') }}">Properties</a>
+                        <a class="nav-link" href="#">Properties</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                        <a class="nav-link" href="#">Contact</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link login-link" href="{{ url_for('login') }}">Đăng Nhập</a>
@@ -91,9 +91,9 @@
                 <h5>Quick Links</h5>
                 <ul class="list-unstyled">
                     <li><a href="{{ url_for('home') }}" class="text-white">Home</a></li>
-                    <li><a href="{{ url_for('properties') }}" class="text-white">Properties</a></li>
+                    <li><a href="#" class="text-white">Properties</a></li>
                     <li><a href="{{ url_for('about') }}" class="text-white">About Us</a></li>
-                    <li><a href="{{ url_for('contact') }}" class="text-white">Contact</a></li>
+                    <li><a href="#" class="text-white">Contact</a></li>
                 </ul>
             </div>
             <!-- Footer Column 3 -->
