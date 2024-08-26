@@ -27,6 +27,7 @@ flask db upgrade
 python data.py
 ```
 Lưu ý là database phải tạo xong mới thêm data được
+
 6. Thay đổi biến môi trường
 - Mở file .flaskenv
 - Thay đổi biến DATABASE_URI
