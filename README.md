@@ -22,7 +22,17 @@ flask db upgrade
 flask db downgrade base
 flask db upgrade
 ```
-5. Lưu ý: database chưa tạo sẵn các record
+5. Tạo data giả trên database
+``` bash
+python data.py
+```
+Lưu ý là database phải tạo xong mới thêm data được
+6. Thay đổi biến môi trường
+- Mở file .flaskenv
+- Thay đổi biến DATABASE_URI
+DATABASE_URI=mysql+pymysql://root:**matkhau**@localhost/thuetro?charset=utf8mb4
+Đổi **matkhau** thành mật khẩu mysql server đã cài đặt
+
 ### Chạy app
 ``` bash
 flask run
