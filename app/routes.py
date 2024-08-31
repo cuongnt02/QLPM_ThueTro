@@ -8,7 +8,8 @@ from cloudinary import uploader
 from app import app, db
 from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
-from app.forms import MotelEditForm
+from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm
+from app.forms import RoomEditForm
 from app.utils import require_roles
 
 
@@ -92,16 +93,63 @@ def room(room_id):
                            title="Chi tiết phòng", room=room)
 
 
-@app.route("/room/<room_id>/edit", methods=['GET'])
+@app.route("/room/<room_id>/edit", methods=['GET', 'POST'])
 def edit_room(room_id):
+    form = RoomEditForm()
     room = db.session.scalar(select(Room).where(Room.id == room_id))
-    return render_template("room_edit.html", title="Chỉnh sửa phòng",
-                           room=room)
+    if form.validate_on_submit():
+        room.room_name = form.room_name.data
+        room.base_price = form.base_price.data
+        room.description = form.description.data
+        room.water_price = form.water_price.data
+        room.electric_price = form.electric_price.data
+        image_path = None
+        if form.picture.data:
+            picture = request.files[form.picture.name]
+            if picture:
+                response = uploader.upload(picture)
+                image_path = response['secure_url']
+                room.picture = image_path
+        db.session.add(room)
+        db.session.commit()
+        flash('Chỉnh sửa phòng thành công')
+        return redirect(url_for('edit_motel', motel_id=room.motel.id))
+
+    elif request.method == 'GET':
+        form.room_name.data = room.room_name
+        form.base_price.data = room.base_price
+        form.description.data = room.description
+        form.water_price.data = room.water_price
+        form.electric_price.data = room.electric_price
+
+    return render_template("room_edit.html", form=form,
+                           title="Chỉnh sửa phòng", room=room)
 
 
 @app.route("/motel/<motel_id>/create", methods=['GET', 'POST'])
 def create_room(motel_id):
-    return render_template("room_create.html", title="Tạo phòng")
+    form = RoomCreateForm()
+    motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
+    if form.validate_on_submit():
+        room = Room(id=str(uuid4()),
+                    room_name=form.room_name.data,
+                    base_price=form.base_price.data,
+                    description=form.description.data,
+                    water_price=form.water_price.data,
+                    electric_price=form.electric_price.data,
+                    motel_id=motel.id)
+        picture_path = None
+        if form.picture.data:
+            picture = request.files[form.picture.name]
+            if picture:
+                response = uploader.upload(picture)
+                picture_path = response['secure_url']
+                room.picture = picture_path
+        db.session.add(room)
+        db.session.commit()
+        flash("Tạo phòng thành công")
+    return render_template("room_create.html", form=form,
+                           title="Tạo phòng", motel=motel)
 
 
 @app.route("/motel/delete/<motel_id>", methods=['DELETE'])
@@ -141,6 +189,13 @@ def edit_motel(motel_id):
     motel = db.session.scalar(select(Motel).where(Motel.id == motel_id))
     if form.validate_on_submit():
         motel.address = form.address.data
+        image_path = None
+        if form.motel_image.data:
+            image = request.files[form.motel_image.name]
+            if image:
+                response = uploader.upload(image)
+                image_path = response['secure_url']
+                motel.image = image_path
         db.session.add(motel)
         db.session.commit()
         flash("Chỉnh sửa nhà trọ thành công")
@@ -155,7 +210,24 @@ def edit_motel(motel_id):
 @login_required
 @require_roles(UserRole.LANDLORD)
 def create_motel():
-    return render_template("motel_create.html", title="Tạo nhà trọ")
+    form = MotelCreateForm()
+    if form.validate_on_submit():
+        motel = Motel(id=str(uuid4()),
+                      address=form.address.data,
+                      max_room=0,
+                      user_id=current_user.id)
+        image_path = None
+        if form.motel_image.data:
+            image = request.files[form.motel_image.name]
+            if image:
+                response = uploader.upload(image)
+                image_path = response['secure_url']
+                motel.image = image_path
+        db.session.add(motel)
+        db.session.commit()
+        flash("Tạo nhà trọ thành công")
+        return redirect(url_for('manage_motel'))
+    return render_template("motel_create.html", form=form, title="Tạo nhà trọ")
 
 
 @app.route("/motel/<motel_id>", methods=['GET'])

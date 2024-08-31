@@ -50,6 +50,8 @@ class User(UserMixin, db.Model):
     #     foreign_keys='Message.receiver_id', back_populates='receiver'
     # )
     reviews: Mapped[List['Review']] = relationship(back_populates='user')
+    motels: Mapped[List['Motel']] = relationship(back_populates='user',
+                                                 cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -69,9 +71,12 @@ class Motel(db.Model):
                                     default=uuid4())
     address: Mapped[str] = mapped_column(String(200))
     max_room: Mapped[int] = mapped_column(Integer)
+    image: Mapped[Optional[str]] = mapped_column(String(256))
 
     rooms: Mapped[List['Room']] = relationship(back_populates="motel",
                                                cascade="all, delete-orphan")
+    user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+    user: Mapped['User'] = relationship(back_populates="motels")
 
     def __repr__(self):
         return f'<Motel {self.address}>'

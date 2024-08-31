@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms import TextAreaField, FileField, RadioField
+from wtforms import TextAreaField, FileField, RadioField, DecimalField
 from wtforms.validators import DataRequired, Email, Optional, Length
 from wtforms.validators import EqualTo, ValidationError
 from app.models import User
@@ -14,7 +14,8 @@ icon_map = {
         'full_name': 'fas fa-user',
         'repeat_password': 'fas fa-key',
         'avatar': 'fas fa-image',
-        'email': 'fas fa-envelope'
+        'email': 'fas fa-envelope',
+        'address': 'fas fa-home'
 }
 
 
@@ -73,9 +74,31 @@ class CommentForm(FlaskForm):
 
 class MotelEditForm(FlaskForm):
     address = StringField('Địa chỉ', validators=[DataRequired()])
+    motel_image = FileField('Hình ảnh', validators=[Optional()])
     submit = SubmitField('Lưu thông tin')
 
 
 class MotelCreateForm(FlaskForm):
     address = StringField('Địa chỉ', validators=[DataRequired()])
+    motel_image = FileField('Hình ảnh', validators=[DataRequired()])
+    submit = SubmitField('Tạo nhà trọ')
+
+
+class RoomCreateForm(FlaskForm):
+    room_name = StringField('Tên phòng', validators=[DataRequired()])
+    base_price = DecimalField('Giá cơ bản', validators=[DataRequired()])
+    description = StringField('Mô tả', validators=[DataRequired()])
+    water_price = DecimalField('Giá nước', validators=[DataRequired()])
+    electric_price = DecimalField('Giá điện', validators=[DataRequired()])
+    picture = FileField('Hình ảnh mô tả', validators=[DataRequired()])
     submit = SubmitField('Tạo phòng')
+
+
+class RoomEditForm(FlaskForm):
+    room_name = StringField('Tên phòng', validators=[DataRequired()])
+    base_price = DecimalField('Giá cơ bản', validators=[DataRequired()])
+    description = StringField('Mô tả', validators=[DataRequired()])
+    water_price = DecimalField('Giá nước', validators=[DataRequired()])
+    electric_price = DecimalField('Giá điện', validators=[DataRequired()])
+    picture = FileField('Hình ảnh mô tả', validators=[Optional()])
+    submit = SubmitField('Chỉnh sửa phòng')
