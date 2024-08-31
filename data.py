@@ -16,11 +16,12 @@ def create_user(username, email, full_name, password, role):
     user.set_password(password)
     return user
 
-def create_motel(address, max_room):
+def create_motel(address, max_room, user_id):
     return Motel(
         id=uuid4(),
         address=address,
-        max_room=max_room
+        max_room=max_room,
+        user_id=user_id
     )
 
 def create_room(room_name, base_price, description, water_price,
@@ -102,8 +103,8 @@ if __name__ == "__main__":
             print("Lỗi: Không thể thêm người dùng do trùng lặp email.")
 
         # Tạo motels
-        m1 = create_motel("Go Vap, Ho Chi Minh", 3)
-        m2 = create_motel("Phu Nhuan, Ho Chi Minh", 4)
+        m1 = create_motel(address="Go Vap, Ho Chi Minh", max_room=3, user_id=u2.id)
+        m2 = create_motel(address="Phu Nhuan, Ho Chi Minh",max_room=4, user_id=u2.id)
         db.session.add_all([m1, m2])
         db.session.commit()
 
