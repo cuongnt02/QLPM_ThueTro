@@ -36,6 +36,9 @@ def login():
             flash("Invalid username or password")
             return redirect(url_for('login'))
         login_user(user=user, remember=form.remember_me.data)
+        if form.role.data == 'ADMIN':
+            if user.user_role == UserRole.ADMIN:
+                return redirect(url_for('admin'))
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
             next_page = url_for('home')
@@ -54,6 +57,13 @@ def register():
                 username=form.username.data,
                 email=form.email.data,
                 full_name=form.full_name.data)
+        avatar_path = None
+        if form.avatar.data:
+            image = request.files[form.avatar.name]
+            if image:
+                response = uploader.upload(image)
+                avatar_path = response['secure_url']
+                user.avatar = avatar_path
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

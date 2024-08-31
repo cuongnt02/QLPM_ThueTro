@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% import "material_wtf.html" as wtf %}
+{% import "bootstrap_wtf.html" as wtf %}
 
 {% block css %}
     {{ super() }}
@@ -20,31 +20,5 @@
 {% endblock %}
 
 {% block content %}
-    <div id="wrapper">
-    <form method="post" enctype="multipart/form-data" action="" id="form-login">
-        <h1 class="form-heading">Form Đăng Ký</h1>
-        <div class="form-group">
-            <i class="far fa-user"></i>
-            <input type="text" class="form-input" id="name" placeholder="Họ Và Tên" name="name">
-        </div>
-        <div class="form-group">
-            <i class="far fa-user"></i>
-            <input type="text" class="form-input" id="username" placeholder="Tên đăng nhập" name="username">
-        </div>
-        <div class="form-group">
-         <i class="fas fa-key"></i>
-            <input type="password" class="form-input" id="password" placeholder="Password" name="password">
-        </div>
-        <div class="form-group">
-            <i class="fas fa-key"></i>
-            <input type="password" class="form-input" id="confirm" placeholder="Xác Nhận Mật khẩu" name="confirm">
-        </div>
-        <div class="form-group">
-            <i class="far fa-user"></i>
-            <input type="file" class="form-input" id="avatar" placeholder="Ảnh Đại Diện" name="avatar">
-        </div>
-        <input type="submit" value="Đăng Ký" class="form-submit">
-    </form>
-</div>
-
+    {{ wtf.generate_form(form, heading='Đăng ký', action=url_for('register'), media=True)}}
 {% endblock %}

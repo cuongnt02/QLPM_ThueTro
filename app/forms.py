@@ -1,16 +1,33 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms import TextAreaField, FileField
+from wtforms import TextAreaField, FileField, RadioField
 from wtforms.validators import DataRequired, Email, Optional, Length
 from wtforms.validators import EqualTo, ValidationError
 from app.models import User
 from app import db
+from app import app
 from sqlalchemy import select
+
+icon_map = {
+        'username': 'fas fa-user',
+        'password': 'fas fa-key',
+        'full_name': 'fas fa-user',
+        'repeat_password': 'fas fa-key',
+        'avatar': 'fas fa-image',
+        'email': 'fas fa-envelope'
+}
+
+
+@app.template_filter('icon')
+def icon_filter(field_name):
+    icon_class = icon_map.get(field_name, '')
+    return icon_class
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Tên tài khoản', validators=[DataRequired()])
+    username = StringField('Tên đăng nhập', validators=[DataRequired()])
     password = PasswordField('Mật khẩu', validators=[DataRequired()])
+    role = RadioField(choices=['Khách hàng', 'ADMIN'])
     remember_me = BooleanField('Ghi nhớ đăng nhập')
     submit = SubmitField('Đăng nhập')
 
@@ -23,6 +40,7 @@ class RegisterForm(FlaskForm):
     repeat_password = PasswordField(
             'Xác nhận mật khẩu',
             validators=[DataRequired(), EqualTo('password')])
+    avatar = FileField('Avatar', validators=[DataRequired()])
     submit = SubmitField('Đăng ký')
 
     def validate_username(self, username):
