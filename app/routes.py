@@ -163,6 +163,17 @@ def delete_motel(motel_id):
         return jsonify({'error': 'Motel not exist'}), 404
 
 
+@app.route("/room/delete/<room_id>", methods=['DELETE'])
+def delete_room(room_id):
+    room = db.session.scalar(select(Room).where(Room.id == room_id))
+    if room:
+        db.session.delete(room)
+        db.session.commit()
+        return jsonify({'message': 'Room deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Room not exist'}), 404
+
+
 @app.route("/post/<post_id>/comment", methods=['GET', 'POST'])
 @login_required
 def comment(post_id):
