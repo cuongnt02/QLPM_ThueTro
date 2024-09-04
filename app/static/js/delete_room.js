@@ -1,5 +1,5 @@
-function deleteMotel(path) {
-    if (confirm('Xác nhận xóa nhà trọ này ?')) {
+function deleteRoom(path) {
+    if (confirm('Xác nhận xóa phòng trọ này ?')) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         fetch(`${path}`, {
             method: 'DELETE',
@@ -9,7 +9,7 @@ function deleteMotel(path) {
         })
         .then(response => {
             if (response.ok) {
-                alert('Xóa nhà trọ thành công');
+                alert('Xóa phòng trọ thành công');
                 location.reload();
             }
             else {

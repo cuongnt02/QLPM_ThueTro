@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Optional, List
-from sqlalchemy import String, Text, ForeignKey, Enum, Integer, Float
+from sqlalchemy import String, Text, ForeignKey, Enum, Integer, Float, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import uuid4
 from flask_login import UserMixin
@@ -42,14 +42,16 @@ class User(UserMixin, db.Model):
                                                 default=UserRole.USER)
 
     posts: Mapped[List['Post']] = relationship(back_populates='author')
-    # bookings: Mapped[List['Booking']] = relationship(back_populates='user')
-    # messages_sent: Mapped[List['Message']] = relationship(
-    #     foreign_keys='Message.sender_id', back_populates='sender'
-    # )
-    # messages_received: Mapped[List['Message']] = relationship(
-    #     foreign_keys='Message.receiver_id', back_populates='receiver'
-    # )
+    bookings: Mapped[List['Booking']] = relationship(back_populates='user')
+    messages_sent: Mapped[List['Message']] = relationship(
+        foreign_keys='Message.sender_id', back_populates='sender'
+    )
+    messages_received: Mapped[List['Message']] = relationship(
+        foreign_keys='Message.receiver_id', back_populates='receiver'
+    )
     reviews: Mapped[List['Review']] = relationship(back_populates='user')
+    motels: Mapped[List['Motel']] = relationship(back_populates='user',
+                                                 cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -61,6 +63,8 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
 
 
+
+
 # Motel model
 class Motel(db.Model):
     __tablename__ = "motels"
@@ -69,9 +73,12 @@ class Motel(db.Model):
                                     default=uuid4())
     address: Mapped[str] = mapped_column(String(200))
     max_room: Mapped[int] = mapped_column(Integer)
+    image: Mapped[Optional[str]] = mapped_column(String(256))
 
     rooms: Mapped[List['Room']] = relationship(back_populates="motel",
                                                cascade="all, delete-orphan")
+    user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+    user: Mapped['User'] = relationship(back_populates="motels")
 
     def __repr__(self):
         return f'<Motel {self.address}>'
@@ -114,6 +121,7 @@ class Post(db.Model):
         default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh"))
     )
 
+
     user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
     room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
 
@@ -126,22 +134,23 @@ class Post(db.Model):
 
 # Booking model
 class Booking(db.Model):
-    __tablename__ = "bookings"
+    __tablename__ = 'bookings'
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-    start_date: Mapped[datetime] = mapped_column()
-    end_date: Mapped[datetime] = mapped_column()
-    total_price: Mapped[float] = mapped_column(Float)
-    status: Mapped[str] = mapped_column(String(20), default='Pending')
+    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    total_price: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="Pending")
+    user_id: Mapped[str] = mapped_column(ForeignKey('users.id'))
+    room_id: Mapped[str] = mapped_column(ForeignKey('rooms.id'))
 
-    # user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
-    room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
-
-    # user: Mapped['User'] = relationship(back_populates="bookings")
-    room: Mapped['Room'] = relationship(back_populates="bookings")
+    user: Mapped['User'] = relationship('User', back_populates='bookings')
+    room: Mapped['Room'] = relationship('Room', back_populates='bookings')
 
     def __repr__(self):
         return f'<Booking {self.id}>'
+
+
 
 
 # Review model
@@ -164,32 +173,38 @@ class Review(db.Model):
 
 
 # Payment model
-# class Payment(db.Model):
-#     __tablename__ = "payments"
-# 
-#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-#     amount: Mapped[float] = mapped_column(Float)
-#     status: Mapped[str] = mapped_column(String(20), default='Pending')
-# 
-#     booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
-#     booking: Mapped['Booking'] = relationship()
-# 
-#     def __repr__(self):
-#         return f'<Payment {self.id}>'
+# Payment model
+class Payment(db.Model):
+    __tablename__ = "payments"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    amount: Mapped[float] = mapped_column(Float)
+    status: Mapped[str] = mapped_column(String(20), default='Pending')
+    payment_id: Mapped[Optional[str]] = mapped_column(String(36))  # Thêm payment_id từ PayPal
+    payer_id: Mapped[Optional[str]] = mapped_column(String(36))  # Thêm payer_id từ PayPal
+
+    booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
+    booking: Mapped['Booking'] = relationship()
+
+    def __repr__(self):
+        return f'<Payment {self.id}>'
+
 
 
 # Message model
-# class Message(db.Model):
-#     __tablename__ = "messages"
-# 
-#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-#     content: Mapped[str] = mapped_column(Text)
-# 
-#     sender_id: Mapped[str] = mapped_column(ForeignKey(User.id))
-#     receiver_id: Mapped[str] = mapped_column(ForeignKey(User.id))
-# 
-#     sender: Mapped['User'] = relationship(foreign_keys=[sender_id], back_populates="messages_sent")
-#     receiver: Mapped['User'] = relationship(foreign_keys=[receiver_id], back_populates="messages_received")
-# 
-#     def __repr__(self):
-#         return f'<Message {self.id}>'
+class Message(db.Model):
+    __tablename__ = "messages"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    content: Mapped[str] = mapped_column(Text)
+
+    sender_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+    receiver_id: Mapped[str] = mapped_column(ForeignKey(User.id))
+
+    sender: Mapped['User'] = relationship('User', foreign_keys=[sender_id], back_populates="messages_sent")
+    receiver: Mapped['User'] = relationship('User', foreign_keys=[receiver_id], back_populates="messages_received")
+
+    def __repr__(self):
+        return f'<Message {self.id}>'
+
+

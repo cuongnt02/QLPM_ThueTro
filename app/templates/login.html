@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% import "material_wtf.html" as wtf %}
+{% import "bootstrap_wtf.html" as wtf %}
 
 {% block css %}
     {{ super() }}
@@ -20,28 +20,5 @@
 {% endblock %}
 
 {% block content %}
-   <div id="wrapper">
-        <form method="post" action="" id="form-login">
-            <h1 class="form-heading">Form đăng nhập</h1>
-            <div class="form-group">
-                <i class="far fa-user"></i>
-                <input type="text" class="form-input" id="username" placeholder="Tên đăng nhập" name="username">
-            </div>
-            <div class="form-group">
-                <i class="fas fa-key"></i>
-                <input type="password" class="form-input" id="password" placeholder="Mật khẩu" name="password">
-                <div id="eye">
-                    <i class="far fa-eye" onclick="password()"></i>
-                </div>
-            </div>
-            <div class="form-group">
-                <input type="radio" id="customer" name="user_role" value="customer" checked>
-                <label style="color: white; margin-right: 10px;" for="customer">Khách hàng</label>
-
-                <input type="radio" id="admin" name="user_role" value="admin">
-                <label style="color: white;" for="admin">ADMIN</label>
-            </div>
-            <input type="submit" value="Đăng nhập" class="form-submit">
-        </form>
-    </div>
+    {{ wtf.generate_form(form, heading='Đăng nhập', action=url_for('login'))}}
 {% endblock %}

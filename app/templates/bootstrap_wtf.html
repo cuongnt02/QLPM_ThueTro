@@ -1,0 +1,75 @@
+{% macro form_field(field, autofocus, disabled=False) %}
+    {%- if field.type == 'BooleanField' %}
+    <div class="form-check mb-3">
+        {{ field.label(class='form-check-label text-white') }}
+        {{ field(class='form-check-input') }}
+    </div>
+    {%- elif (field.type == 'SubmitField') %}
+    {{ field(class='form-submit')}}
+    {%- elif (field.type == 'TextAreaField') %}
+    <div class="form-group">
+        {{ field.label(class='form-label')}}
+        {{ field(class='form-input') }}
+    </div>
+    {%- elif (field.type == 'FileField') %}
+    <div class="form-group mb-3">
+        {% if (field.name | icon) != "" %}
+        <i class="{{ field.name | icon }}"></i>
+        {% endif %}
+        {{ field(class='form-control', accept='.png,.jpg') }}
+    </div>
+    {%- elif (field.type == 'RadioField') %}
+    <div class="form-group">
+        {% for item in field %}
+        <div class="form-check{% if loop.last %} ml-3{% endif %} me-3">
+            {{ item(class='form-check-input') }}
+            {{ item.label(class='form-check-label text-white mr-3') }}
+        </div>
+        {% endfor %}
+    </div>
+    {%- else %}
+    <div class="form-group mb-3">
+        {% if (field.name | icon) != "" %}
+        <i class="{{ field.name | icon }}"></i>
+        {% endif %}
+        {% if autofocus %}
+            {{field(class='form-input' + (' invalid' if field.errors else ''), placeholder=field.label.text, autofocus=True, disabled=disabled)}}
+        {% else %}
+            {{field(class='form-input' + (' invalid' if field.errors else ''), placeholder=field.label.text, disabled=disabled)}}
+        {% endif %}
+        {%- for error in field.errors %}
+        <div class="invalid-feedback">{{ error }}</div>
+        {%- endfor %}
+    </div>
+    {%- endif %}
+{% endmacro %}
+
+{% macro generate_form(form, heading="", action="", method="post", id="form-login", novalidate=True, media=False) %}
+<div id="wrapper">
+    <form 
+        {%- if action !="None" %} action="{{ action }}"{% endif -%}
+        {%- if method %} method="{{ method }}"{% endif -%}
+         id="{{ id }}"
+        {%- if novalidate %} novalidate{% endif -%}
+        {%- if media %} enctype="multipart/form-data"{% endif -%}
+        >
+        <h1 class="form-heading">{{ heading }}</h1>
+        {{ form.hidden_tag() }}
+        {%- for field, errors in form.errors.items() %}
+            {%- if form[field].widget.input_type == 'hidden' %}
+                {%- for error in errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {%- endfor -%}
+            {%- endif %}
+        {%- endfor %}
+
+        {% set ns = namespace(first_field=true) %}
+        {%- for field in form %}
+            {% if field.widget.input_type != 'hidden' -%}
+                {{ form_field(field, ns.first_field) }}
+                {% set ns.first_field = false %}
+            {%- endif %}
+        {%- endfor %}
+    </form>
+</div>
+{% endmacro %}

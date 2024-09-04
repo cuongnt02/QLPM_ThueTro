@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% import "material_wtf.html" as wtf %}
+{% import "bootstrap_wtf.html" as wtf %}
 
 {% block title %}
     {{ super() }} - Trang Chủ
@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center mb-4">Chỉnh sửa nhà trọ</h1>
-    {{ wtf.generate_form(form=form, action=url_for('edit_motel', motel_id=motel.id)) }}
+    {{ wtf.generate_form(form=form, action=url_for('edit_motel', motel_id=motel.id), media=True) }}
 
     <h3 class="text-center mb-4">Danh sách phòng</h3>
     {% if motel.rooms|length %}
@@ -20,8 +20,9 @@
         </div>
         <div class="col-md-8">
           <div class="card-body">
-              <h5 class="card-title">Phòng {{ room.name }}</h5>
+              <h5 class="card-title">Phòng {{ room.room_name }}</h5>
               <a href="{{ url_for('edit_room', room_id=room.id) }}" class="btn btn-primary">Chỉnh sửa</a>
+              <button class="btn btn-danger" onclick="deleteRoom('{{ url_for('delete_room', room_id=room.id) }}');">Xóa</button>
           </div>
         </div>
       </div>
@@ -32,4 +33,7 @@
     {% endif %}
     <a href="{{ url_for('create_room', motel_id=motel.id) }}" class="btn btn-primary">Tạo phòng trọ</a>
 </div>
+{% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/delete_room.js')}}"></script>
 {% endblock %}

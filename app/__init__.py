@@ -14,6 +14,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
+app.config['SECRET_KEY'] = 'a_very_secret_key'
 csrf = CSRFProtect(app)
 
 # Initialize Flask-Admin with Bootswatch theme (pull from github new version)

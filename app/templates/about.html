@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ super() }} - Về Chúng Tôi
+{% endblock %}
+
+{% block content %}
+<div class="about-page">
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center text-white" style="height: 500px ; background-image: url('https://res.cloudinary.com/driiz3taz/image/upload/v1725014919/destinations/1010nen2_ijpiom.jpg'); background-size: cover; background-position: center; padding: 100px 0;">
+        <div class="container">
+            <h1 class="display-4 font-weight-bold"></h1>
+            <p class="lead"></p>
+        </div>
+    </section>
+
+    <!-- Welcome Section -->
+    <section class="welcome-section py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 text-center">
+                    <h2 class="font-weight-bold mb-4">Chào Mừng Đến Với Dịch Vụ Thuê Phòng Của Chúng Tôi</h2>
+                    <p class="lead">
+                        Chúng tôi cam kết cung cấp cho bạn những lựa chọn thuê phòng tốt nhất và làm cho quá trình tìm kiếm ngôi nhà tiếp theo của bạn trở nên dễ dàng nhất có thể.
+                        Nền tảng của chúng tôi được thiết kế để kết nối chủ nhà và người thuê qua một giao diện dễ sử dụng và đáng tin cậy.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Gallery Section -->
+    <section class="image-gallery-section py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h3 class="font-weight-bold mb-4">Hình Ảnh Đặc Sắc</h3>
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <img src="https://res.cloudinary.com/driiz3taz/image/upload/v1725381180/Working/images_1_zhedno.jpg" class="img-fluid" alt="Ảnh 1">
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <img src="https://res.cloudinary.com/driiz3taz/image/upload/v1725381078/Working/t%E1%BA%A3i_xu%E1%BB%91ng_2_h1n3ns.jpg" class="img-fluid" alt="Ảnh 2">
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <img src="https://res.cloudinary.com/driiz3taz/image/upload/v1725380954/Working/t%E1%BA%A3i_xu%E1%BB%91ng_1_coshn7.jpg" class="img-fluid" alt="Ảnh 3">
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <img src="https://res.cloudinary.com/driiz3taz/image/upload/v1725380956/Working/t%E1%BA%A3i_xu%E1%BB%91ng_jsymxr.jpg" class="img-fluid" alt="Ảnh 4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-bullseye fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title font-weight-bold">Sứ Mệnh Của Chúng Tôi</h5>
+                            <p class="card-text">Mang đến trải nghiệm minh bạch, dễ dàng cho cả chủ nhà và người thuê bằng cách đảm bảo tất cả các tin đăng đều chính xác và cập nhật.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-thumbs-up fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title font-weight-bold">Tin Cậy & An Toàn</h5>
+                            <p class="card-text">Chúng tôi ưu tiên sự an toàn và tin cậy bằng cách xác minh tất cả các tin đăng và duy trì một nền tảng an toàn cho mọi người dùng.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <i class="fas fa-globe fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title font-weight-bold">Phạm Vi Toàn Cầu</h5>
+                            <p class="card-text">Nền tảng của chúng tôi kết nối người thuê và chủ nhà từ khắp nơi trên thế giới, cung cấp nhiều lựa chọn đa dạng để phù hợp với mọi nhu cầu.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 text-center">
+                    <h3 class="font-weight-bold mb-4">Liên Hệ Với Chúng Tôi</h3>
+                    <p class="lead mb-4">Chúng tôi luôn sẵn sàng hỗ trợ bạn với bất kỳ câu hỏi hoặc thắc mắc nào. Hãy liên hệ với chúng tôi qua các phương thức sau:</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                            <p>Email: <a href="mailto:support@rentalservice.com">support@rentalservice.com</a></p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                            <p>Điện thoại: +1-800-555-1234</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
+                            <p>Địa chỉ: 123 Đường Chính, Thành Phố Hồ Chí Minh, Việt Nam</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block css %}
+<style>
+    .hero-section {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-10px);
+    }
+    .text-primary {
+        color: #007bff !important;
+    }
+    .img-fluid {
+        max-width: 100%;
+        height: auto;
+    }
+    .image-gallery-section {
+        padding: 30px 0;
+    }
+    .d-flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .gallery-item {
+        flex: 1 1 calc(25% - 15px); /* 4 items per row with gap included */
+        margin-bottom: 15px;
+    }
+    .gallery-item img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}

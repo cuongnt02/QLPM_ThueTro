@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    {{ super() }}
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block header %}
+    {% block nav %}
+        {{ super() }}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    {{ wtf.generate_form(form=form, heading='Chỉnh sửa phòng', action=url_for('edit_room', room_id=room.id), media=True) }}
+{% endblock %}

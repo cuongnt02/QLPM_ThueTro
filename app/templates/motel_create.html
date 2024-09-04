@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block title %}
+    {{ super() }} - Tạo nhà trọ
+{% endblock %}
+
+{% block content %}
+    {{ wtf.generate_form(form, heading='Tạo nhà trọ', action=url_for('create_motel'), media=True)}}
+{% endblock %}
