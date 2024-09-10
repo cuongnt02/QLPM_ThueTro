@@ -4,8 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 from cloudinary import uploader
-
-from app import app, db
+from app import app ,db
 from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm

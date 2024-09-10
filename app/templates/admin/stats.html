@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews by User</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Đặt kích thước cho phần tử canvas */
+        #reviewsChart {
+            width: 20%; /* Chiều rộng của biểu đồ */
+            height: 10%; /* Chiều cao của biểu đồ */
+        }
+    </style>
+</head>
+<body>
+    <h1>Reviews by User</h1>
+
+    <!-- Canvas element cho biểu đồ Chart.js -->
+      <canvas id="reviewsChart"></canvas>
+
+    <script>
+        // Dữ liệu truyền từ Flask (qua Jinja2 template)
+        var labels = {{ output['labels'] | tojson }};
+        var values = {{ output['values'] | tojson }};
+
+        // Hàm tạo màu ngẫu nhiên
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Hàm chọn kiểu biểu đồ ngẫu nhiên
+        function getRandomChartType() {
+            var chartTypes = ['bar', 'line', 'pie', 'doughnut', 'radar'];
+            return chartTypes[Math.floor(Math.random() * chartTypes.length)];
+        }
+
+        // Khởi tạo biểu đồ Chart.js
+        var ctx = document.getElementById('reviewsChart').getContext('2d');
+        var reviewsChart = new Chart(ctx, {
+            type: getRandomChartType(), // Chọn kiểu biểu đồ ngẫu nhiên
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Reviews',
+                    data: values,
+                    backgroundColor: getRandomColor(), // Chọn màu nền ngẫu nhiên
+                    borderColor: getRandomColor(), // Chọn màu viền ngẫu nhiên
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
