@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block title %}
+    {{ super() }} - Tạo nhà trọ
+{% endblock %}
+
+{% block content %}
+    {{ wtf.generate_form(form, heading='Tạo bài đăng', action=url_for('create_post', username=current_user.username), media=True)}}
+{% endblock %}
+
+
+{% block js %}
+    <script src="https://cdn.tiny.cloud/1/ol5e4ef0h7aymmmmqtk1j2w7y6a3h1oracrrio0kfr3ekawq/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="{{ url_for('static', filename='js/tinymce_init.js') }}"></script>
+{% endblock %}
