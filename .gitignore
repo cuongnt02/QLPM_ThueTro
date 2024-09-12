@@ -1,6 +1,6 @@
 # Byte-compiled / optimized / DLL files
 app/__pycache__/
-migrations/versions/__pycache__/
+migrations/versions/__pycache__/*
 __pycache__/
 *.py[cod]
 *$py.class
