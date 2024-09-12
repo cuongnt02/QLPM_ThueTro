@@ -11,7 +11,7 @@ from app import app, db
 from app.models import User, Post, Motel, Room, UserRole
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm
-from app.forms import PostCreateForm
+from app.forms import PostCreateForm, BookingForm
 from app.forms import RoomEditForm
 from app.utils import require_roles
 

@@ -63,8 +63,6 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
 
 
-
-
 # Motel model
 class Motel(db.Model):
     __tablename__ = "motels"
@@ -187,31 +185,21 @@ class PostImage(db.Model):
     post: Mapped['Post'] = relationship(back_populates="post_images")
 
 
-class PostImage(db.Model):
-    __tablename__ = "post_images"
-    id: Mapped[str] = mapped_column(String(36),
-                                    primary_key=True, default=str(uuid4()))
-    image_path: Mapped[str] = mapped_column(String(256))
-
-    post_id: Mapped[str] = mapped_column(ForeignKey(Post.id))
-
-    post: Mapped['Post'] = relationship(back_populates="post_images")
-
-
 # Payment model
-# Payment model
-# class Payment(db.Model):
-#     __tablename__ = "payments"
-# 
-#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-#     amount: Mapped[float] = mapped_column(Float)
-#     status: Mapped[str] = mapped_column(String(20), default='Pending')
-# 
-#     booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
-#     booking: Mapped['Booking'] = relationship()
-# 
-#     def __repr__(self):
-#         return f'<Payment {self.id}>'
+class Payment(db.Model):
+    __tablename__ = "payments"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    amount: Mapped[float] = mapped_column(Float)
+    status: Mapped[str] = mapped_column(String(20), default='Pending')
+    payment_id: Mapped[Optional[str]] = mapped_column(String(36))
+    payer_id: Mapped[Optional[str]] = mapped_column(String(36))
+
+    booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
+    booking: Mapped['Booking'] = relationship()
+
+    def __repr__(self):
+        return f'<Payment {self.id}>'
 
 
 # Message model

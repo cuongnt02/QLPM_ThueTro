@@ -21,9 +21,7 @@ def create_motel(address, max_room, user_id):
         id=uuid4(),
         address=address,
         max_room=max_room,
-        user_id=user_id
-        max_room=max_room,
-        user_id=user_id
+        user_id=user_id,
     )
 
 def create_room(room_name, base_price, description, water_price,
