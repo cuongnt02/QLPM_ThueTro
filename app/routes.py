@@ -8,9 +8,10 @@ from sqlalchemy import select
 from cloudinary import uploader
 
 from app import app, db
-from app.models import User, Post, Motel, Room, UserRole, Booking, Payment
-from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm, BookingForm
+from app.models import User, Post, Motel, Room, UserRole
+from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm
+from app.forms import PostCreateForm
 from app.forms import RoomEditForm
 from app.utils import require_roles
 
@@ -267,12 +268,39 @@ def motel(motel_id):
                            title="Thông tin nhà trọ", motel=motel)
 
 
-@app.route("/user/<username>/create")
+@app.route("/user/<username>/create", methods=['GET', 'POST'])
 @login_required
 @require_roles(UserRole.LANDLORD)
 def create_post(username):
+    form = PostCreateForm()
     user = db.first_or_404(select(User).where(User.username == username))
-    return render_template("post_create.html", user=user)
+    motels = db.session.scalars(select(Motel).where(Motel.user_id == user.id))
+    rooms = []
+    for motel in motels:
+        for room in motel.rooms:
+            rooms.append(room)
+    room_list = [(room.id, room.room_name) for room in rooms]
+    form.room.choices = room_list
+    if form.validate_on_submit():
+        post = Post(id=str(uuid4()),
+                    title=form.post_title.data,
+                    content=form.content.data,
+                    user_id=user.id,
+                    room_id=form.room.data)
+        db.session.add(post)
+        db.session.commit()
+        gallery = request.files.getlist(form.gallery.name)
+        if gallery:
+            for image in gallery:
+                postimage = PostImage(id=str(uuid4()))
+                if image:
+                    response = uploader.upload(image)
+                    postimage.image_path = response['secure_url']
+                postimage.post_id = post.id
+                db.session.add(postimage)
+            db.session.commit()
+        return redirect(url_for('home'))
+    return render_template("post_create.html", user=user, form=form)
 
 
 @app.route("/user/<username>")

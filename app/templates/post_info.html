@@ -21,19 +21,40 @@
 {% block content %}
     <div class="row">
         <div class="col s12">
-            <h1>{{ room.room_name }}</h1>
-            <p>{{ post.content }}</p>
+            <h1>{{ post.title }}</h1>
+            {{ post.content | safe }}
         </div>
     </div>
 
     <div class="row">
         <div class="col s12">
-            <h3>Hình ảnh</h3>
-            {% if room.picture %}
-                <img src="{{ room.picture }}" alt="{{ room.room_name }}" class="responsive-img">
-            {% else %}
-                <p>Không có hình ảnh</p>
-            {% endif %}
+            <h3>Hình ảnh</h2>
+            <!-- many images here -->
+            <div class="col md-6">
+                <div id="carousel" class="carousel slide">
+                    <div class="carousel-inner">
+                        {% if post.post_images %}
+                            {% for post_image in post.post_images %}
+                            <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                                <img src="{{ post_image.image_path }}" class="d-block w-100" alt="Hình ảnh nhà trọ">
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="carousel-item active">
+                                <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Hình ảnh mặc định">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

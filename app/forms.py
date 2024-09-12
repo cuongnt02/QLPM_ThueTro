@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms import TextAreaField, FileField, RadioField, DecimalField
-from wtforms.csrf.session import SessionCSRF
+from wtforms import SelectField, MultipleFileField
 from wtforms.validators import DataRequired, Email, Optional, Length
 from wtforms.validators import EqualTo, ValidationError
 from app.models import User
@@ -104,6 +104,10 @@ class RoomEditForm(FlaskForm):
     picture = FileField('Hình ảnh mô tả', validators=[Optional()])
     submit = SubmitField('Chỉnh sửa phòng')
 
-class BookingForm(FlaskForm):
-    csrf_token = SessionCSRF()
-    submit = SubmitField('Book Now')
+
+class PostCreateForm(FlaskForm):
+    post_title = StringField('Tiêu đề', validators=[DataRequired()])
+    content = TextAreaField('Nội dung', validators=[DataRequired()])
+    room = SelectField('Room', validators=[DataRequired()])
+    gallery = MultipleFileField('Hình ảnh', validators=[Optional()])
+    submit = SubmitField('Tạo bài đăng')

@@ -100,7 +100,8 @@ class Room(db.Model):
     motel_id: Mapped[str] = mapped_column(ForeignKey(Motel.id))
     motel: Mapped['Motel'] = relationship(back_populates="rooms")
 
-    posts: Mapped[List['Post']] = relationship(back_populates="room", cascade="all, delete-orphan")
+    posts: Mapped[List['Post']] = relationship(back_populates="room",
+                                               cascade="all, delete-orphan")
     bookings: Mapped[List['Booking']] = relationship(back_populates="room")
     reviews: Mapped[List['Review']] = relationship(back_populates="room")
 
@@ -113,7 +114,7 @@ class Post(db.Model):
     __tablename__ = "posts"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True,
-                                    default=uuid4())
+                                    default=str(uuid4()))
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[str] = mapped_column(Text)
     timestamp: Mapped[datetime] = mapped_column(
@@ -127,6 +128,9 @@ class Post(db.Model):
 
     author: Mapped['User'] = relationship(back_populates='posts')
     room: Mapped['Room'] = relationship(back_populates='posts')
+
+    post_images: Mapped[List['PostImage']] = relationship(
+        back_populates='post', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Post {self.title}>'
@@ -172,23 +176,42 @@ class Review(db.Model):
         return f'<Review {self.rating}>'
 
 
+class PostImage(db.Model):
+    __tablename__ = "post_images"
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=str(uuid4()))
+    image_path: Mapped[str] = mapped_column(String(256))
+
+    post_id: Mapped[str] = mapped_column(ForeignKey(Post.id))
+
+    post: Mapped['Post'] = relationship(back_populates="post_images")
+
+
+class PostImage(db.Model):
+    __tablename__ = "post_images"
+    id: Mapped[str] = mapped_column(String(36),
+                                    primary_key=True, default=str(uuid4()))
+    image_path: Mapped[str] = mapped_column(String(256))
+
+    post_id: Mapped[str] = mapped_column(ForeignKey(Post.id))
+
+    post: Mapped['Post'] = relationship(back_populates="post_images")
+
+
 # Payment model
 # Payment model
-class Payment(db.Model):
-    __tablename__ = "payments"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-    amount: Mapped[float] = mapped_column(Float)
-    status: Mapped[str] = mapped_column(String(20), default='Pending')
-    payment_id: Mapped[Optional[str]] = mapped_column(String(36))  # Thêm payment_id từ PayPal
-    payer_id: Mapped[Optional[str]] = mapped_column(String(36))  # Thêm payer_id từ PayPal
-
-    booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
-    booking: Mapped['Booking'] = relationship()
-
-    def __repr__(self):
-        return f'<Payment {self.id}>'
-
+# class Payment(db.Model):
+#     __tablename__ = "payments"
+# 
+#     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+#     amount: Mapped[float] = mapped_column(Float)
+#     status: Mapped[str] = mapped_column(String(20), default='Pending')
+# 
+#     booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
+#     booking: Mapped['Booking'] = relationship()
+# 
+#     def __repr__(self):
+#         return f'<Payment {self.id}>'
 
 
 # Message model
