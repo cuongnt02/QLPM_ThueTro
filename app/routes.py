@@ -8,7 +8,7 @@ from sqlalchemy import select
 from cloudinary import uploader
 
 from app import app, db
-from app.models import User, Post, Motel, Room, UserRole
+from app.models import User, Post, Motel, Room, UserRole, Booking, Payment
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm
 from app.forms import PostCreateForm, BookingForm
@@ -387,7 +387,6 @@ def booking(room_id):
 
 
 @app.route('/payment/execute', methods=['GET'])
-
 @app.route('/payment/execute/<room_id>', methods=['GET'])
 def payment_execute(room_id):
     payment_id = request.args.get('orderID')
@@ -417,15 +416,14 @@ def payment_execute(room_id):
 
     return redirect(url_for('home', room_id=room_id))
 
+
 @app.route('/payment/cancel', methods=['GET'])
 def payment_cancel():
     # Xử lý khi thanh toán bị hủy
     return "Thanh toán bị hủy"
 
 
-
 @app.route("/receipt/<room_id>", methods=['GET'])
-
 def receipt(room_id):
     room = db.session.scalar(select(Room).where(Room.id == room_id))
     if room:
@@ -436,7 +434,6 @@ def receipt(room_id):
 
 
 @app.route("/booking", methods=['GET'])
-
 def booking_page():
     return render_template("booking.html", title="Đặt phòng")
 
