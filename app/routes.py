@@ -436,7 +436,3 @@ def receipt(room_id):
 @app.route("/booking", methods=['GET'])
 def booking_page():
     return render_template("booking.html", title="Đặt phòng")
-
-
-
-
