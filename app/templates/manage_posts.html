@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ super() }} - Quản lí bài viết
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Danh sách bài viết</h1>
+
+    {% if posts %}
+    {% for post in posts %}
+    <div class="card mb-3 mx-auto" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">{{post.title}}</h5>
+            <a href="{{ url_for('user_posts', username=current_user.username) }}" class="btn btn-primary">Chỉnh sửa</a>
+            <button class="btn btn-danger" onclick="deleteMotel('{{url_for('delete_motel', motel_id=motel.id) }}');">Xóa</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>Chưa có bài viết nào</p>
+    {% endif %}
+    <a class="btn btn-primary" href="{{ url_for('create_motel') }}">Tạo nhà trọ</a>
+</div>
+{% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/delete_motel.js')}}"></script>
+{% endblock %}

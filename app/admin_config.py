@@ -1,4 +1,4 @@
-from app import db, app,dao
+from app import db, app
 from app.models import User, Post, Motel, Room, UserRole ,Booking, Review
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView
