@@ -7,7 +7,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = (
         os.environ.get('DATABASE_URI') or
         "mysql+pymysql://root:%s@localhost/thuetro?charset=utf8mb4"
-        % quote('123456789'))
+        % quote('0308110299Go'))
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     DEBUG = True
     CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY') or ''
