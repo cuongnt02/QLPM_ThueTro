@@ -7,9 +7,8 @@
     {%- elif (field.type == 'SubmitField') %}
     {{ field(class='form-submit')}}
     {%- elif (field.type == 'TextAreaField') %}
-    <div class="form-group">
-        {{ field.label(class='form-label')}}
-        {{ field(class='form-input') }}
+    <div class="form-floating">
+        {{ field(class='form-control', id='textarea') }}
     </div>
     {%- elif (field.type == 'FileField') %}
     <div class="form-group mb-3">
@@ -27,16 +26,21 @@
         </div>
         {% endfor %}
     </div>
+    {%- elif (field.type == 'SelectField') %}
+    <div class="form-group">
+        {{ field() }}
+    </div>
     {%- else %}
-    <div class="form-group mb-3">
+    <div class="form-floating mb-3">
         {% if (field.name | icon) != "" %}
         <i class="{{ field.name | icon }}"></i>
         {% endif %}
         {% if autofocus %}
-            {{field(class='form-input' + (' invalid' if field.errors else ''), placeholder=field.label.text, autofocus=True, disabled=disabled)}}
+            {{field(class='form-control' + (' invalid' if field.errors else ''), placeholder=field.label.text, autofocus=True, disabled=disabled)}}
         {% else %}
-            {{field(class='form-input' + (' invalid' if field.errors else ''), placeholder=field.label.text, disabled=disabled)}}
+            {{field(class='form-control' + (' invalid' if field.errors else ''), placeholder=field.label.text, disabled=disabled)}}
         {% endif %}
+        {{ field.label() }}
         {%- for error in field.errors %}
         <div class="invalid-feedback">{{ error }}</div>
         {%- endfor %}

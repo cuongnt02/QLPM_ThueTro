@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {{ super() }} - Chi tiết phòng
+{{ super() }} - Chi tiết phòng
 {% endblock %}
 
 {% block content %}
@@ -14,13 +14,13 @@
             <div id="roomImages" class="carousel slide">
                 <div class="carousel-inner">
                     {% if room.picture %}
-                        <div class="carousel-item active">
-                            <img src="{{ room.picture }}" class="d-block w-100" alt="{{ room.room_name }}">
-                        </div>
+                    <div class="carousel-item active">
+                        <img src="{{ room.picture }}" class="d-block w-100" alt="{{ room.room_name }}">
+                    </div>
                     {% else %}
-                        <div class="carousel-item active">
-                            <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Hình ảnh mặc định">
-                        </div>
+                    <div class="carousel-item active">
+                        <img src="https://via.placeholder.com/800x400" class="d-block w-100" alt="Hình ảnh mặc định">
+                    </div>
                     {% endif %}
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#roomImages" data-bs-slide="prev">
@@ -42,27 +42,66 @@
                 <li><strong>Địa chỉ:</strong> {{ room.motel.address }}</li>
                 <li><strong>Mô tả:</strong> {{ room.description }}</li>
             </ul>
-            <a href="{{ url_for('booking', room_id=room.id) }}" class="btn btn-primary">Đặt phòng</a>
+
+            <!-- Thêm nút thanh toán PayPal -->
+            <div id="paypal-button-container"></div>
+
+            <!-- Form đặt phòng -->
+            <form id="bookingForm" action="{{ url_for('booking', room_id=room.id) }}" method="post">
+                {{ form.hidden_tag() }}
+                <button type="submit" class="btn btn-primary">Đặt phòng</button>
+            </form>
         </div>
     </div>
 
     <h3 class="mt-4">Đánh giá</h3>
     <div class="row">
         {% if room.reviews|length %}
-            {% for review in room.reviews %}
-                <div class="col-md-12 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Đánh giá của {{ review.user.full_name }}</h5>
-                            <p class="card-text">{{ review.comment }}</p>
-                            <p class="card-text"><small class="text-muted">Rating: {{ review.rating }}</small></p>
-                        </div>
-                    </div>
+        {% for review in room.reviews %}
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Đánh giá của {{ review.user.full_name }}</h5>
+                    <p class="card-text">{{ review.comment }}</p>
+                    <p class="card-text"><small class="text-muted">Rating: {{ review.rating }}</small></p>
                 </div>
-            {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
         {% else %}
-            <p>Chưa có đánh giá nào.</p>
+        <p>Chưa có đánh giá nào.</p>
         {% endif %}
     </div>
 </div>
+
+<!-- Thêm meta tag cho CSRF token -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+<!-- Liên kết với file JavaScript -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Thêm đoạn mã PayPal JavaScript -->
+<script src="https://www.paypal.com/sdk/js?client-id=ARjB0Vl_utFQqmJzoM7ABib94XnH8q63urVLtrlvEgQkT_c_cZtYwHhSh7dvaQflMQ0NgeyzTqixSMDx&currency=USD"></script>
+<script>
+ paypal.Buttons({
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: '{{ room.base_price|float }}'
+                }
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+            window.location.href = "{{ url_for('payment_execute', room_id=room.id, _external=True) }}?orderID=" + data.orderID + "&payerID=" + details.payer.payer_id;
+        });
+    },
+    onCancel: function(data) {
+        window.location.href = "{{ url_for('payment_cancel', room_id=room.id, _external=True) }}";
+    }
+}).render('#paypal-button-container');
+
+</script>
 {% endblock %}
