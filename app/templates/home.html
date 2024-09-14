@@ -20,7 +20,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ post.title }}</h5>
                         <p class="card-text">{{ post.content }}</p>
-                        <a href="{{ url_for('room', room_id=post.room.id) }}" class="btn btn-primary">Xem chi tiết</a>
+                        <a href="{{ url_for('post', post_id=post.id) }}" class="btn btn-primary">Xem chi tiết</a>
                     </div>
                 </div>
             </div>

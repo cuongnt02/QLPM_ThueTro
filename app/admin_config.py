@@ -1,17 +1,22 @@
 from app import db, app
-from app.models import User, Post, Motel, Room, UserRole ,Booking, Review
+from app.models import User, Post, Motel, Room, UserRole, Booking, Review
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView
+from flask_admin.base import AdminIndexView
 from flask_login import logout_user, current_user
-from flask import redirect, request
+from flask import redirect, abort
 from flask_admin import Admin
 from flask_admin.theme import Bootstrap4Theme
 from flask_admin.base import expose
+from app.utils import require_roles
 
 
+class AdminIndex(AdminIndexView):
 
-admin = Admin(app, name='THUETRO ADMIN',
-                  theme=Bootstrap4Theme(swatch='cyborg'))
+    @require_roles(UserRole.ADMIN)
+    @expose('/')
+    def index(self):
+        return super(AdminIndex, self).index()
 
 
 class AuthenticatedAdmin(ModelView):
@@ -22,7 +27,6 @@ class AuthenticatedAdmin(ModelView):
 class AuthenticatedUser(BaseView):
     def is_accessible(self):
         return current_user.is_authenticated
-
 
 
 class LogoutView(AuthenticatedUser):
@@ -47,7 +51,9 @@ class CustomReviewReport(BaseView):
         values = [total_reviews for _, total_reviews in results]
 
         # Return JSON data to template
-        return self.render('admin/stats.html', output={'labels': labels, 'values': values})
+        return self.render('admin/stats.html',
+                           output={'labels': labels, 'values': values})
+
 
 class BookingReport(BaseView):
     @expose('/', methods=['GET'])
@@ -57,12 +63,13 @@ class BookingReport(BaseView):
             db.func.count(Booking.id).label('total_bookings')
         ).group_by(db.func.date(Booking.start_date)) \
          .all()
-
         labels = [date.strftime('%Y-%m-%d') for date, _ in results]
         values = [count for _, count in results]
 
         # Return JSON data to template
-        return self.render('admin/stats.html', output={'labels': labels, 'values': values})
+        return self.render('admin/stats.html',
+                           output={'labels': labels, 'values': values})
+
 
 class MotelReport(BaseView):
     @expose('/', methods=['GET'])
@@ -78,7 +85,8 @@ class MotelReport(BaseView):
         values = [total_rooms for _, total_rooms in results]
 
         # Return JSON data to template
-        return self.render('admin/stats.html', output={'labels': labels, 'values': values})
+        return self.render('admin/stats.html',
+                           output={'labels': labels, 'values': values})
 
 class PostReport(BaseView):
     @expose('/', methods=['GET'])
@@ -96,6 +104,8 @@ class PostReport(BaseView):
 
         # Return JSON data to template
         return self.render('admin/stats.html', output={'labels': labels, 'values': values})
+
+
 class ReviewReport(BaseView):
     @expose('/', methods=['GET'])
     def average_rating_by_room(self):
@@ -111,7 +121,10 @@ class ReviewReport(BaseView):
         values = [average_rating for _, average_rating in results]
 
         # Return JSON data to template
-        return self.render('admin/stats.html', output={'labels': labels, 'values': values})
+        return self.render('admin/stats.html',
+                           output={'labels': labels, 'values': values})
+
+
 class RevenueReport(BaseView):
     @expose('/', methods=['GET'])
     def total_revenue_by_day(self):
@@ -126,6 +139,11 @@ class RevenueReport(BaseView):
 
         # Return JSON data to template
         return self.render('admin/stats.html', output={'labels': labels, 'values': values})
+
+
+admin = Admin(app, name='THUETRO ADMIN', index_view=AdminIndex(),
+              theme=Bootstrap4Theme(swatch='cyborg'))
+
 # Add CustomModelView to the admin interface
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Booking, db.session))
@@ -133,9 +151,9 @@ admin.add_view(ModelView(Post, db.session))
 admin.add_view(ModelView(Motel, db.session))
 admin.add_view(ModelView(Room, db.session))
 admin.add_view(CustomReviewReport(name='Thông kê đánh giá của người dùng'))
-admin.add_view(BookingReport (name='Thong ke dat phong '))
-admin.add_view(MotelReport(name= 'Thong ke nha tro'))
-admin.add_view(PostReport(name= 'Thong ke bai dang'))
-admin.add_view(ReviewReport(name= 'Thong ke danh gia'))
+admin.add_view(BookingReport(name='Thong ke dat phong '))
+admin.add_view(MotelReport(name='Thong ke nha tro'))
+admin.add_view(PostReport(name='Thong ke bai dang'))
+admin.add_view(ReviewReport(name='Thong ke danh gia'))
 admin.add_view(RevenueReport(name='thong ke doanh thu'))
 admin.add_view(LogoutView(name='Đăng xuất'))

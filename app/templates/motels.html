@@ -8,7 +8,7 @@
 <div class="container">
     <h1 class="text-center mb-4">Danh sách nhà trọ</h1>
 
-    {% if motels %}
+    {% if motels | length > 0 %}
     {% for motel in motels %}
     <div class="card mb-3 mx-auto" style="max-width: 540px;">
       <div class="row no-gutters">
@@ -26,7 +26,7 @@
     </div>
     {% endfor %}
     {% else %}
-    <p>Chưa có phòng trọ</p>
+    <p>Chưa có nhà trọ</p>
     {% endif %}
     <a class="btn btn-primary" href="{{ url_for('create_motel') }}">Tạo nhà trọ</a>
 </div>

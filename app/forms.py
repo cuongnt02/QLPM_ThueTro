@@ -113,5 +113,13 @@ class PostCreateForm(FlaskForm):
     submit = SubmitField('Tạo bài đăng')
 
 
+class PostEditForm(FlaskForm):
+    post_title = StringField('Tiêu đề', validators=[DataRequired()])
+    content = TextAreaField('Nội dung', validators=[DataRequired()])
+    room = SelectField('Room', validators=[DataRequired()])
+    gallery = MultipleFileField('Hình ảnh', validators=[Optional()])
+    submit = SubmitField('Tạo bài đăng')
+
+
 class BookingForm(FlaskForm):
     submit = SubmitField('Book Now')

@@ -1,5 +1,4 @@
 # models.py
-
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -120,7 +119,6 @@ class Post(db.Model):
         default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh"))
     )
 
-
     user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
     room_id: Mapped[str] = mapped_column(ForeignKey(Room.id))
 
@@ -138,10 +136,15 @@ class Post(db.Model):
 class Booking(db.Model):
     __tablename__ = 'bookings'
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
-    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    total_price: Mapped[int] = mapped_column(Integer, nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True,
+                                    default=str(uuid4()))
+    start_date: Mapped[datetime] = mapped_column(
+            DateTime,
+            default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh")))
+    end_date: Mapped[datetime] = mapped_column(
+            DateTime,
+            default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh")))
+    total_price: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="Pending")
     user_id: Mapped[str] = mapped_column(ForeignKey('users.id'))
     room_id: Mapped[str] = mapped_column(ForeignKey('rooms.id'))
