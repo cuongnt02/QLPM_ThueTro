@@ -15,8 +15,8 @@
         <div class="col-md-8">
           <div class="card-body">
             <h5 class="card-title">{{post.title}}</h5>
-            <a href="{{ url_for('user_posts', username=current_user.username) }}" class="btn btn-primary">Chỉnh sửa</a>
-            <button class="btn btn-danger" onclick="deleteMotel('{{url_for('delete_motel', motel_id=motel.id) }}');">Xóa</a>
+            <a href="{{ url_for('edit_post', username=current_user.username, post_id=post.id) }}" class="btn btn-primary">Chỉnh sửa</a>
+            <button class="btn btn-danger" onclick="deletePost('{{url_for('delete_post', username=current_user.username, post_id=post.id) }}');">Xóa</a>
           </div>
         </div>
       </div>
@@ -25,9 +25,9 @@
     {% else %}
     <p>Chưa có bài viết nào</p>
     {% endif %}
-    <a class="btn btn-primary" href="{{ url_for('create_motel') }}">Tạo nhà trọ</a>
+    <a class="btn btn-primary" href="{{ url_for('create_post', username=current_user.username) }}">Tạo bài viết</a>
 </div>
 {% endblock %}
 {% block js %}
-<script src="{{ url_for('static', filename='js/delete_motel.js')}}"></script>
+<script src="{{ url_for('static', filename='js/delete_post.js')}}"></script>
 {% endblock %}
