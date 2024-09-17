@@ -1,8 +1,13 @@
 from urllib.parse import urlsplit
+import math
 from uuid import uuid4
+from datetime import datetime
+from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 import paypalrestsdk
 from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import make_response
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
 from cloudinary import uploader
@@ -13,12 +18,12 @@ from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm
 from app.forms import PostCreateForm, BookingForm, PostEditForm
 from app.forms import RoomEditForm
-from app.utils import require_roles
+from app.utils import require_roles, momo_request_payment
 
 paypalrestsdk.configure({
     "mode": "sandbox",  # hoặc "live" để dùng trên môi trường sản xuất
-    "client_id": "ARjB0Vl_utFQqmJzoM7ABib94XnH8q63urVLtrlvEgQkT_c_cZtYwHhSh7dvaQflMQ0NgeyzTqixSMDx",
-    "client_secret": "ENNui3hmj9i59mHjp-VHr-Rm8PuWxVIlm6Ukb9deeiOnvnrQ3YK--0XBhVF_a_54DTmfab4pFEXBDlQZ"
+    "client_id": "AX8GaBCtK9V09WscY3_BOBwIlbsZ5ZFHNTt-h6Q8z1VvgSQWe7SMILYfQYn2Wq78CML20XnhNRlskwhA",
+    "client_secret": "EHzwoiR1VRGRKaof9zBhXudFPlTGY4aRZ4_MEDwClKdpcwLKTI9mHDsrXyD-woiW5jC_Kcw7DP1c8gp1"
 })
 
 
@@ -101,9 +106,11 @@ def post(post_id):
 @app.route("/room/<room_id>", methods=['GET'])
 def room(room_id):
     room = db.session.scalar(select(Room).where(Room.id == room_id))
-    form = BookingForm()  # Thêm dòng này để khởi tạo form
+    if not room:
+        flash('Phòng không tồn tại')
+        return redirect(url_for('home'))
     return render_template("room_detail.html",
-                           title="Chi tiết phòng", room=room, form=form)
+                           title="Chi tiết phòng", room=room)
 
 
 @app.route("/about", methods=['GET'])
@@ -388,42 +395,79 @@ def contract():
 
 
 @app.route("/room/<room_id>/booking", methods=['GET', 'POST'])
+@login_required
 def booking(room_id):
+    form = BookingForm()
     room = db.session.scalar(select(Room).where(Room.id == room_id))
+    total_price = (
+                room.base_price +
+                room.water_price +
+                room.electric_price) * 50 / 100
+    start_date = datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh"))
+    end_date = start_date + timedelta(days=14)
+    booking = Booking(id=str(uuid4()), start_date=start_date, end_date=end_date, total_price=total_price, user_id=current_user.id, room_id=room.id)
+    if form.validate_on_submit():
+        db.session.add(booking)
+        db.session.commit()
+        return redirect(url_for('booking_info', booking_id=booking.id))
+    if request.method == 'GET':
+        form.start_date.data = booking.start_date
+        form.end_date.data = booking.end_date
+        form.total_price.data = booking.total_price
+    return render_template('booking.html', title='Đặt phòng', room=room, booking=booking, form=form)
 
-    if not room:
-        flash('Phòng không tồn tại')
-        return redirect(url_for('home'))
-    return render_template('booking.html', title='Đặt phòng')
 
+@app.route('/booking/<booking_id>/payment')
+@login_required
+def pay_booking(booking_id):
     # Tạo yêu cầu thanh toán với PayPal
-    # payment = paypalrestsdk.Payment({
-    #     "intent": "sale",
-    #     "payer": {
-    #         "payment_method": "paypal"},
-    #     "redirect_urls": {
-    #         "return_url": url_for('payment_execute', room_id=room.id, _external=True),
-    #         "cancel_url": url_for('payment_cancel', room_id=room.id, _external=True)},
-    #     "transactions": [{
-    #         "item_list": {
-    #             "items": [{
-    #                 "name": room.room_name,
-    #                 "sku": str(room.id),
-    #                 "price": f'{room.base_price:.2f}',
-    #                 "currency": "USD",
-    #                 "quantity": 1}]},
-    #         "amount": {
-    #             "total": f'{room.base_price:.2f}',
-    #             "currency": "USD"},
-    #         "description": f"Đặt phòng: {room.room_name}"}]})
+    booking = db.session.scalar(select(Booking).where(Booking.id == booking_id))
+    payment = paypalrestsdk.Payment({
+         "intent": "sale",
+         "payer": {
+             "payment_method": "paypal"},
+         "redirect_urls": {
+             "return_url": url_for('payment_execute', room_id=room.id, _external=True),
+             "cancel_url": url_for('payment_cancel', room_id=room.id, _external=True)},
+         "transactions": [{
+             "item_list": {
+                 "items": [{
+                     "name": "Cọc tiền trọ phòng " + booking.room.room_name,
+                     "sku": booking.room.id,
+                     "price": f'{booking.total_price:.2f}',
+                     "currency": "VND",
+                     "quantity": 1}]},
+             "amount": {
+                 "total": f'{booking.total_price:.2f}',
+                 "currency": "VND"},
+             "description": f"Đặt cọc phòng: {room.room_name}"}]})
 
-    # if payment.create():
-    #     for link in payment.links:
-    #         if link.rel == "approval_url":
-    #             return redirect(link.href)
-    # else:
-    #     flash(f"Đã xảy ra lỗi: {payment.error}")
-    #     return redirect(url_for('room', room_id=room_id))
+    if payment.create():
+        for link in payment.links:
+            if link.rel == "approval_url":
+                return redirect(link.href)
+    else:
+        flash(f"Đã xảy ra lỗi: {payment.error}")
+        return redirect(url_for('home'))
+
+
+@app.route('/booking/<booking_id>')
+@login_required
+def booking_info(booking_id):
+    booking = db.session.scalar(select(Booking).where(Booking.id == booking_id))
+    return render_template("booking_info.html", booking=booking)
+
+
+@app.route('/user/<username>/payments')
+@login_required
+def user_payments(username):
+    return "User payment page"
+
+
+@app.route('/receipt/<receipt_id>')
+@login_required
+def receipt_info(receipt_id):
+    return "Receipt info"
 
 
 @app.route('/payment/execute', methods=['GET'])
@@ -455,6 +499,38 @@ def payment_execute(room_id):
         flash(f"Đã xảy ra lỗi: {e}", 'danger')
 
     return redirect(url_for('home', room_id=room_id))
+
+
+@app.route('/payment/momo', methods=['GET'])
+@login_required
+def momo_payment():
+    payment_name = request.args.get('paymentName')
+    total_price = request.args.get('totalPrice')
+    if payment_name == '' or total_price == '':
+        return render_template("404.html"), 404
+    payment_id = str(uuid4())
+    user_id = current_user.id
+    payment = Payment(id=payment_id, payment_name=payment_name, payment_type="MOMO", amount=total_price, user_id=user_id)
+    extra_data = {"username": current_user.username}
+    response = momo_request_payment(math.floor(float(total_price)), extra_data, payment_id, payment_name)
+    if response['resultCode'] == 0:
+        payment.status = "PENDING"
+        db.session.add(payment)
+        db.session.commit()
+        return response, 200
+    else:
+        return render_template("500.html"), 500
+
+
+@app.route('/payment/<payment_id>/momo/info', methods=['GET'])
+@login_required
+def momo_payment_check(payment_id):
+    payment = db.session.scalar(select(Payment).where(Payment.id == payment_id))
+    if request.args['resultCode'] == 0:
+        payment.status = 'PAID'
+        return render_template("payment-success.html")
+    else:
+        return render_template("payment-failed.html")
 
 
 @app.route('/payment/cancel', methods=['GET'])

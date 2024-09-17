@@ -67,14 +67,6 @@ def create_review(user_id, room_id, rating, comment):
         room_id=room_id
     )
 
-def create_payment(booking_id, amount, status="Pending"):
-    return Payment(
-        id=uuid4(),
-        amount=amount,
-        status=status,
-        booking_id=booking_id
-    )
-
 def create_message(sender_id, receiver_id, content):
     return Message(
         id=uuid4(),
@@ -137,10 +129,6 @@ if __name__ == "__main__":
         db.session.commit()
 
         # Tạo payments
-        pay1 = create_payment(b1.id, 6000000, "Paid")
-        pay2 = create_payment(b2.id, 3750000, "Pending")
-        db.session.add_all([pay1, pay2])
-        db.session.commit()
 
         # Tạo messages
         msg1 = create_message(u1.id, u2.id, "Xin chào, phòng còn trống không?")

@@ -47,10 +47,7 @@
             <div id="paypal-button-container"></div>
 
             <!-- Form đặt phòng -->
-            <form id="bookingForm" action="{{ url_for('booking', room_id=room.id) }}" method="post">
-                {{ form.hidden_tag() }}
-                <button type="submit" class="btn btn-primary">Đặt phòng</button>
-            </form>
+            <a href="{{url_for('booking', room_id=room.id)}}" class="btn btn-primary">Đặt phòng</a>
         </div>
     </div>
 
@@ -79,29 +76,4 @@
 
 <!-- Liên kết với file JavaScript -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-<!-- Thêm đoạn mã PayPal JavaScript -->
-<script src="https://www.paypal.com/sdk/js?client-id=ARjB0Vl_utFQqmJzoM7ABib94XnH8q63urVLtrlvEgQkT_c_cZtYwHhSh7dvaQflMQ0NgeyzTqixSMDx&currency=USD"></script>
-<script>
- paypal.Buttons({
-    createOrder: function(data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: '{{ room.base_price|float }}'
-                }
-            }]
-        });
-    },
-    onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-            window.location.href = "{{ url_for('payment_execute', room_id=room.id, _external=True) }}?orderID=" + data.orderID + "&payerID=" + details.payer.payer_id;
-        });
-    },
-    onCancel: function(data) {
-        window.location.href = "{{ url_for('payment_cancel', room_id=room.id, _external=True) }}";
-    }
-}).render('#paypal-button-container');
-
-</script>
 {% endblock %}
