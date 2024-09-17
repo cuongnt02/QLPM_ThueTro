@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms import TextAreaField, FileField, RadioField, DecimalField
-from wtforms import SelectField, MultipleFileField
+from wtforms import SelectField, MultipleFileField, DateTimeField
 from wtforms.validators import DataRequired, Email, Optional, Length
 from wtforms.validators import EqualTo, ValidationError
 from app.models import User
@@ -122,4 +122,7 @@ class PostEditForm(FlaskForm):
 
 
 class BookingForm(FlaskForm):
-    submit = SubmitField('Book Now')
+    start_date = DateTimeField('Ngày đặt')
+    end_date = DateTimeField('Ngày hẹn trả')
+    total_price = DecimalField('Giá cọc')
+    submit = SubmitField('Đặt cọc')

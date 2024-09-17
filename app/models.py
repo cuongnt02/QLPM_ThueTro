@@ -52,6 +52,9 @@ class User(UserMixin, db.Model):
     motels: Mapped[List['Motel']] = relationship(back_populates='user',
                                                  cascade="all, delete-orphan")
 
+    payments: Mapped[Optional[List['Payment']]] = relationship(back_populates='user',
+                                                     cascade="all, delete-orphan")
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -143,7 +146,7 @@ class Booking(db.Model):
             default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh")))
     end_date: Mapped[datetime] = mapped_column(
             DateTime,
-            default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh")))
+            default=lambda: datetime.now(tz=ZoneInfo("Asia/Ho_Chi_Minh")) + datetime.timedelta(days=14))
     total_price: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="Pending")
     user_id: Mapped[str] = mapped_column(ForeignKey('users.id'))
@@ -156,14 +159,12 @@ class Booking(db.Model):
         return f'<Booking {self.id}>'
 
 
-
-
 # Review model
 class Review(db.Model):
     __tablename__ = "reviews"
 
     id: Mapped[str] = mapped_column(String(36),
-                                    primary_key=True, default=uuid4())
+                                    primary_key=True, default=str(uuid4()))
     rating: Mapped[int] = mapped_column(Integer)
     comment: Mapped[Optional[str]] = mapped_column(Text)
 
@@ -192,14 +193,17 @@ class PostImage(db.Model):
 class Payment(db.Model):
     __tablename__ = "payments"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid4())
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=str(uuid4()))
+    payment_name: Mapped[str] = mapped_column(String(256))
+    payment_type: Mapped[str] = mapped_column(String(20))
     amount: Mapped[float] = mapped_column(Float)
     status: Mapped[str] = mapped_column(String(20), default='Pending')
     payment_id: Mapped[Optional[str]] = mapped_column(String(36))
+    payer_email: Mapped[Optional[str]] = mapped_column(String(36))
     payer_id: Mapped[Optional[str]] = mapped_column(String(36))
 
-    booking_id: Mapped[str] = mapped_column(ForeignKey(Booking.id))
-    booking: Mapped['Booking'] = relationship()
+    user_id: Mapped[Optional[str]] = mapped_column(ForeignKey(User.id))
+    user: Mapped['User'] = relationship(back_populates="payments")
 
     def __repr__(self):
         return f'<Payment {self.id}>'

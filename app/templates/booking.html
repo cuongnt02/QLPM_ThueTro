@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
 
 {% block css %}
     {{ super() }}
@@ -21,7 +22,9 @@
 {% block content %}
     <div class="row">
         <div class="col s12">
-            Thông tin đặt phòng
+            <h1>Thông tin đặt phòng</h1>
         </div>
+    </div>
+        {{ wtf.generate_form(form=form, action=url_for('booking', room_id=room.id), media=True) }}
     </div>
 {% endblock %}
