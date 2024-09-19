@@ -2,12 +2,14 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms import TextAreaField, FileField, RadioField, DecimalField
 from wtforms import SelectField, MultipleFileField, DateTimeField
+from wtforms import DecimalRangeField
 from wtforms.validators import DataRequired, Email, Optional, Length
-from wtforms.validators import EqualTo, ValidationError
+from wtforms.validators import EqualTo, ValidationError, NumberRange
 from app.models import User
 from app import db
 from app import app
 from sqlalchemy import select
+from enum import Enum
 
 icon_map = {
         'username': 'fas fa-user',
@@ -24,6 +26,14 @@ icon_map = {
 def icon_filter(field_name):
     icon_class = icon_map.get(field_name, '')
     return icon_class
+
+
+@app.template_filter()
+def to_string(obj):
+    if isinstance(obj, Enum):
+        return obj.value
+    return obj
+
 
 
 class LoginForm(FlaskForm):
@@ -70,6 +80,7 @@ class UserEditForm(FlaskForm):
 
 class CommentForm(FlaskForm):
     content = TextAreaField('Điền bình luận', validators=[DataRequired()])
+    rating = DecimalRangeField('Đánh giá', validators=[NumberRange(min=0.0, max=5.0)])
     submit = SubmitField('Lưu')
 
 

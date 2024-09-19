@@ -6,14 +6,14 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 
 import paypalrestsdk
-from flask import render_template, flash, redirect, url_for, request, jsonify
-from flask import make_response
+from flask import render_template, flash, redirect, url_for, request, jsonify, g
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import select
+from sqlalchemy.sql import func
 from cloudinary import uploader
 
 from app import app, db
-from app.models import User, Post, Motel, Room, UserRole, Booking, Payment, PostImage
+from app.models import User, Post, Motel, Room, UserRole, Booking, Payment, PostImage, Review
 from app.forms import LoginForm, RegisterForm, UserEditForm, CommentForm
 from app.forms import MotelEditForm, MotelCreateForm, RoomCreateForm
 from app.forms import PostCreateForm, BookingForm, PostEditForm
@@ -25,6 +25,11 @@ paypalrestsdk.configure({
     "client_id": "AX8GaBCtK9V09WscY3_BOBwIlbsZ5ZFHNTt-h6Q8z1VvgSQWe7SMILYfQYn2Wq78CML20XnhNRlskwhA",
     "client_secret": "EHzwoiR1VRGRKaof9zBhXudFPlTGY4aRZ4_MEDwClKdpcwLKTI9mHDsrXyD-woiW5jC_Kcw7DP1c8gp1"
 })
+
+
+@app.before_request
+def before_request():
+    g.UserRole = UserRole
 
 
 @app.route('/')
@@ -55,7 +60,7 @@ def login():
         login_user(user=user, remember=form.remember_me.data)
         if form.role.data == 'ADMIN':
             if user.user_role == UserRole.ADMIN:
-                return redirect(url_for('admin'))
+                return redirect(url_for('admin.index'))
         next_page = request.args.get('next')
         if not next_page or urlsplit(next_page).netloc != '':
             next_page = url_for('home')
@@ -99,18 +104,20 @@ def logout():
 def post(post_id):
     post = db.session.scalar(select(Post).where(Post.id == post_id))
     room = db.session.scalar(select(Room).where(Room.id == post.room.id))
+    reviews = db.session.scalars(select(Review).where(Review.room == room)).all()
     return render_template("post_info.html",
-                           title="Bài viết", post=post, room=room)
+                           title="Bài viết", post=post, room=room, reviews=reviews)
 
 
 @app.route("/room/<room_id>", methods=['GET'])
 def room(room_id):
     room = db.session.scalar(select(Room).where(Room.id == room_id))
+    average_rating = round(db.session.query(db.func.avg(Review.rating)).filter(Review.room==room).scalar(), 1)
     if not room:
         flash('Phòng không tồn tại')
         return redirect(url_for('home'))
     return render_template("room_detail.html",
-                           title="Chi tiết phòng", room=room)
+                           title="Chi tiết phòng", room=room, average_rating=average_rating)
 
 
 @app.route("/about", methods=['GET'])
@@ -204,6 +211,15 @@ def delete_room(room_id):
 def comment(post_id):
     form = CommentForm()
     post = db.session.scalar(select(Post).where(Post.id == post_id))
+    user = db.session.scalar(select(User).where(User.username == current_user.username))
+    if form.validate_on_submit():
+        content = form.content.data
+        rating = form.rating.data
+        review = Review(id=str(uuid4()), comment=content, rating=float(rating), user=user, room=post.room)
+        db.session.add(review)
+        db.session.commit()
+        flash('Thêm bình luận thành công - đánh giá của bạn đã được lưu')
+        return redirect(url_for('post', post_id=post.id))
     return render_template("comment.html", title="Bình luận", form=form,
                            post=post)
 
@@ -333,6 +349,14 @@ def edit_post(username, post_id):
             rooms.append(room)
     room_list = [(room.id, room.room_name) for room in rooms]
     form.room.choices = room_list
+    if form.validate_on_submit():
+        post.title = form.post_title.data
+        post.content = form.content.data
+        post.room_id = form.room.data
+        db.session.add(post)
+        db.session.commit()
+        flash("Chỉnh sửa phòng thành công")
+        return redirect(url_for('user_posts', username=user.username))
     if request.method == 'GET':
         form.post_title.data = post.title
         form.content.data = post.content
@@ -458,10 +482,20 @@ def booking_info(booking_id):
     return render_template("booking_info.html", booking=booking)
 
 
+@app.route('/user/<username>/bookings')
+@login_required
+def user_bookings(username):
+    user = db.first_or_404(select(User).where(User.username == username))
+    bookings = db.session.scalars(select(Booking).where(Booking.user_id == user.id)).all()
+    return render_template('user-bookings.html', user=user, bookings=bookings)
+
+
 @app.route('/user/<username>/payments')
 @login_required
 def user_payments(username):
-    return "User payment page"
+    user = db.session.scalar(select(User).where(User.username == username))
+    payments = db.session.scalars(select(Payment).where(Payment.user_id == user.id)).all()
+    return render_template('user-payments.html', payments=payments)
 
 
 @app.route('/receipt/<receipt_id>')
@@ -530,7 +564,7 @@ def momo_payment_check(payment_id):
         payment.status = 'PAID'
         return render_template("payment-success.html")
     else:
-        return render_template("payment-failed.html")
+        return render_template("payment-failure.html")
 
 
 @app.route('/payment/cancel', methods=['GET'])

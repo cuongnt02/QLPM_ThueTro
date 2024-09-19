@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ super() }} - Thanh toán của bạn
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Danh sách thanh toán</h1>
+
+    {% if payments | length > 0 %}
+    {% for payment in payments %}
+    <div class="card mb-3 mx-auto" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-8">
+          <div class="card-body">
+              <h5 class="card-title">{{payment.payment_name}}</h5>
+              <h5 class="card-title">{{payment.amount}}</h5>
+              <h5 class="card-title">Thanh toán qua {{payment.payment_type}}</h5>
+            <h5 class="card-title">Tình trạng: {{payment.status}}</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>Chưa có thanh toán nào</p>
+    {% endif %}
+</div>
+{% endblock %}

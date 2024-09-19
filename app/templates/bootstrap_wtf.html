@@ -26,6 +26,11 @@
         </div>
         {% endfor %}
     </div>
+    {%- elif (field.type == 'DecimalRangeField') %}
+    <div class="form-floating">
+        {{ field(class="form-range", id="rangeInput") }}
+        <p id="sliderValue" class="text-white">0.0</p>
+    </div>
     {%- elif (field.type == 'SelectField') %}
     <div class="form-group">
         {{ field() }}
