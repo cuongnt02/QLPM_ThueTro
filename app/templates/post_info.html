@@ -83,8 +83,24 @@
         </div>
         <div class="col s6">
             <h3>Bình luận</h3>
-            <!-- comment section here  -->
-            <a class="btn" href="{{ url_for('comment', post_id=post.id) }}">Viết bình luận</a>
+            {% if reviews | length > 0 %}
+                {% for review in reviews%}
+                <div class="card mb-3 mx-auto" style="max-width: 540px;">
+                  <div class="row no-gutters">
+                    <div class="col-md-8">
+                      <div class="card-body">
+                          <h5 class="card-title">{{review.comment | safe}}</h5>
+                          <h5 class="card-title">{{review.rating}}&#11088;</h5>
+                          <p><em>{{review.user.username}}</em></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <p>Chưa có bình luận nào</p>
+            {% endif %}
+            <a class="btn btn-success" href="{{ url_for('comment', post_id=post.id) }}">Viết bình luận</a>
         </div>
     </div>
 {% endblock %}

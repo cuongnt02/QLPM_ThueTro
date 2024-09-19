@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ super() }} - Đặt cọc của bạn
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Danh sách đặt cọc</h1>
+
+    {% if bookings | length > 0 %}
+    {% for booking in bookings %}
+    <div class="card mb-3 mx-auto" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">Phòng {{booking.room.room_name}}</h5>
+            <h5 class="card-title">Tình trạng: {{booking.status}}</h5>
+            <a href="{{ url_for('booking_info', booking_id=booking.id) }}" class="btn btn-primary">Chi tiết</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>Chưa có đặt cọc nào</p>
+    {% endif %}
+</div>
+{% endblock %}

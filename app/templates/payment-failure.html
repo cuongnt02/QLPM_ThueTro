@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block css %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    {{ super() }}
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block header %}
+    {% block nav %}
+        {{ super() }}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    <h1>THANH TOÁN THẤT BẠI</h1>
+    <a class="btn" href="{{ url_for('home') }}">Trở về</a>
+{% endblock %}

@@ -165,7 +165,7 @@ class Review(db.Model):
 
     id: Mapped[str] = mapped_column(String(36),
                                     primary_key=True, default=str(uuid4()))
-    rating: Mapped[int] = mapped_column(Integer)
+    rating: Mapped[float] = mapped_column(Float)
     comment: Mapped[Optional[str]] = mapped_column(Text)
 
     user_id: Mapped[str] = mapped_column(ForeignKey(User.id))
