@@ -1,8 +1,8 @@
-"""db reset
+"""final db reset
 
-Revision ID: ad8593ae44f3
+Revision ID: 2f51fec78c3e
 Revises: 
-Create Date: 2024-09-15 05:46:10.268894
+Create Date: 2024-09-20 17:19:44.857562
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ad8593ae44f3'
+revision = '2f51fec78c3e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,8 +39,8 @@ def upgrade():
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('sender_id', sa.String(length=36), nullable=False),
     sa.Column('receiver_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['receiver_id'], ['users.id'], name="fk_user_receiver" ),
-    sa.ForeignKeyConstraint(['sender_id'], ['users.id'], name="fk_user_sender" ),
+    sa.ForeignKeyConstraint(['receiver_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['sender_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('motels',
@@ -49,7 +49,20 @@ def upgrade():
     sa.Column('max_room', sa.Integer(), nullable=False),
     sa.Column('image', sa.String(length=256), nullable=True),
     sa.Column('user_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name="fk_motel_user" ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('payments',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('payment_name', sa.String(length=256), nullable=False),
+    sa.Column('payment_type', sa.String(length=20), nullable=False),
+    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('payment_id', sa.String(length=36), nullable=True),
+    sa.Column('payer_email', sa.String(length=36), nullable=True),
+    sa.Column('payer_id', sa.String(length=36), nullable=True),
+    sa.Column('user_id', sa.String(length=36), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('rooms',
@@ -61,7 +74,7 @@ def upgrade():
     sa.Column('electric_price', sa.Float(), nullable=False),
     sa.Column('picture', sa.String(length=256), nullable=True),
     sa.Column('motel_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['motel_id'], ['motels.id'], name="fk_motel_room" ),
+    sa.ForeignKeyConstraint(['motel_id'], ['motels.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('bookings',
@@ -72,8 +85,8 @@ def upgrade():
     sa.Column('status', sa.String(length=50), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=False),
     sa.Column('room_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], name="fk_booking_room" ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name="fk_booking_user" ),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('posts',
@@ -83,8 +96,8 @@ def upgrade():
     sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=False),
     sa.Column('room_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], name="fk_post_room" ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name="fk_post_user"),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('posts', schema=None) as batch_op:
@@ -92,29 +105,19 @@ def upgrade():
 
     op.create_table('reviews',
     sa.Column('id', sa.String(length=36), nullable=False),
-    sa.Column('rating', sa.Integer(), nullable=False),
+    sa.Column('rating', sa.Float(), nullable=False),
     sa.Column('comment', sa.Text(), nullable=True),
     sa.Column('user_id', sa.String(length=36), nullable=False),
     sa.Column('room_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], name="fk_review_room" ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name="fk_revew_user" ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('payments',
-    sa.Column('id', sa.String(length=36), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('payment_id', sa.String(length=36), nullable=True),
-    sa.Column('payer_id', sa.String(length=36), nullable=True),
-    sa.Column('booking_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['booking_id'], ['bookings.id'], name="fk_payment_booking" ),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('post_images',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('image_path', sa.String(length=256), nullable=False),
     sa.Column('post_id', sa.String(length=36), nullable=False),
-    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name="fk_post_post_images" ),
+    sa.ForeignKeyConstraint(['post_id'], ['posts.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
@@ -123,7 +126,6 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('post_images')
-    op.drop_table('payments')
     op.drop_table('reviews')
     with op.batch_alter_table('posts', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_posts_timestamp'))
@@ -131,6 +133,7 @@ def downgrade():
     op.drop_table('posts')
     op.drop_table('bookings')
     op.drop_table('rooms')
+    op.drop_table('payments')
     op.drop_table('motels')
     op.drop_table('messages')
     with op.batch_alter_table('users', schema=None) as batch_op:
